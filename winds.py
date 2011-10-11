@@ -10,9 +10,8 @@ import sys
 
 tm = time.time()
 time=time.localtime(tm)
-day=time[2]
-hour=time[3]
-minute=time[4]
+hour=time.tm_hour
+minute=time.tm_min
 
 entityChars = {"auml" : "ä", "ouml" : "ö", "aring" : "å", "nbsp" : " ", "Auml" : "Ä", "Ouml" : "Ö", "Aring" : "å"}
 
@@ -463,3 +462,11 @@ print '<a href="http://dlarah.org/forecasts.html">Ennusteet</a><br/>'
 print '<a href="http://dlarah.org/winds_ee.html">Eesti asemat</a>'
 print '<br/><br/>'
 print ' </html>'
+#dir = 'ttt/'
+dir = '/hsphere/local/home/saberg/dlarah.org/wind_data/'
+for l in list:
+    f = open(dir + l[0] + "_" + str(time.tm_year) + "-" + str(time.tm_yday) + ".txt", "a")
+    f.write(str(time.tm_year) + ',' + str(time.tm_mon) + ',' + str(time.tm_mday) + ',' + str(time.tm_hour) + ',' + str(time.tm_min) + ',' + str(l[1]) + ',' + str(l[2]) + ',' + str(l[3]) + ',' + str(l[4]) + ',' + str(l[5]) + ',' + str(l[6]))
+    f.write("\n")
+    f.close()
+
