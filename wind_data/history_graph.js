@@ -1,4 +1,5 @@
 
+var xmlhttp;
 var canvas;
 var context;
 var windowMatrix;
@@ -13,6 +14,10 @@ var topMargin = 8;
 var dataMaxY = 20;
 var dataMaxX = 100;
 var dataMinX = 0;
+var fetchYear;
+var fetchDay;
+var fetchStation;
+var stationsList;
 
 // check also data today from yesterday 
 var stationData;
@@ -119,8 +124,6 @@ function flipYMatrix()
 
 function fetchData()
 {
-    var xmlhttp;
-    xmlhttp=new XMLHttpRequest();
     xmlhttp.onreadystatechange=function()
         {
             if (xmlhttp.readyState==4/* && xmlhttp.status==200*/)
@@ -130,7 +133,7 @@ function fetchData()
                 parseAndDrawData();
             }
         }
-    xmlhttp.open("GET", "Harmaja_2011-285.txt", true);
+    xmlhttp.open("GET", fetchStation + "_" + fetchYear + "-" + fetchDay + ".txt", true);
     xmlhttp.send();
     debug("xmlhttp.send");
 }
@@ -173,6 +176,31 @@ function parseAndDrawData()
     stroke();
 }
 
+function parseStationsList()
+{
+  var sa = stationsList.split("\n");
+  var yearDay = sa[0].split(",");
+  fetchYear = parseInt(yearDay[0]);
+  fetchDay  = parseInt(yearDay[1]);
+  fetchStation = sa[1];
+  fetchData();
+}
+
+function fetchStations() 
+{
+    xmlhttp.onreadystatechange=function()
+        {
+            if (xmlhttp.readyState==4/* && xmlhttp.status==200*/)
+            {
+                debug(xmlhttp.responseText);
+	      stationsList = xmlhttp.responseText;
+	      parseStationsList();
+            }
+        }
+    xmlhttp.open("GET", "stations.txt", true);
+    xmlhttp.send();
+}
+
 function drawGraph()
 {
     canvas = document.getElementById("graphCanvas");
@@ -189,7 +217,8 @@ function drawGraph()
     viewMatrix = windowMatrix;
     drawBox();
     
-    fetchData();
+    xmlhttp=new XMLHttpRequest();
+    fetchStations();
 }
 
 function debugMatrix(m)
