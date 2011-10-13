@@ -11,6 +11,8 @@ var topMargin = 0;
 var dataMaxX = 100;
 var dataMaxY = 20;
 
+var data = [[0, 8], [10, 2], [20, 6], [30, 7], [40, 8], [50, 5], [60, 6], [70, 12], [80, 16]];
+
 function viewX(dataX) 
 {
 }
@@ -46,6 +48,20 @@ function drawBox()
     lineTo(0, drawAreaHeight);
     lineTo(0, 0);
     stroke();
+}
+
+function drawLabels() 
+{
+    context.fillStyle    = '#000000';
+    var y;
+    for (y = 0; y < dataMaxY; y += 5) {
+        var p1 = $V([0, y, 1]);
+        p1 = viewMatrix.multiply(p1);
+        context.fillText(y + "", 2, p1.e(2));
+        moveTo(0, y);
+        lineTo(dataMaxX, y);
+        stroke();
+    }
 }
 
 function translateMatrix(x, y) 
@@ -89,16 +105,35 @@ function drawGraph()
     viewMatrix = viewMatrix.multiply(scaleMatrix(drawAreaWidth / canvas.width,
                                                  drawAreaHeight / canvas.height));
     drawBox();
+    
+
+    var i;
+    dataMaxX = 0;
+    dataMaxY = 0;
+
+    for (i = 0; i < data.length; i++) {
+        if (data[i][0] > dataMaxX) {
+            dataMaxX = data[i][0];
+        }
+        if (data[i][1] > dataMaxY) {
+            dataMaxY = data[i][1];
+        }
+    }
+
 
     viewMatrix = viewMatrix.multiply(scaleMatrix(drawAreaWidth / dataMaxX,
                                                  drawAreaHeight/ dataMaxY));
+    drawLabels();
+
 //    debugMatrix(viewMatrix);
 
-    moveTo(0, 0);
-    lineTo(10, 10);
-    lineTo(10, 0);
-    lineTo(20, 20);
-    lineTo(30, 10);
+    for (i = 0; i < data.length; i++) {
+        if (i == 0) {
+            moveTo(data[i][0], data[i][1]);
+        } else {
+            lineTo(data[i][0], data[i][1]);
+        }
+    }
     stroke();
 }
 
