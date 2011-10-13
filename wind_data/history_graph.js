@@ -138,8 +138,21 @@ function fetchData()
     debug("xmlhttp.send");
 }
 
+function clearCanvas()
+{
+  context.fillStyle = "white";
+  context.fillRect(0 , 0 , canvas.width , canvas.height);
+  context.beginPath();
+  //  context.clearRect( 0 , 0 , canvas.width , canvas.height);
+  //  context.clearRect( 0 , 0 , 100, 100);
+  /*  var w = canvas.width;
+  canvas.width = 1;
+  canvas.width = w;*/
+}
+
 function parseAndDrawData()
 {
+    clearCanvas();
     parseData();
     
     var i;
@@ -164,6 +177,7 @@ function parseAndDrawData()
     dataMatrix = dataMatrix.multiply(translateMatrix(-dataMinX, 0));
 
     viewMatrix = windowMatrix.multiply(dataMatrix);
+
     drawLabels();
 
     for (i = 0; i < data.length; i++) {
@@ -179,6 +193,7 @@ function parseAndDrawData()
 function parseStationsList()
 {
   var sa = stationsList.split("\n");
+  createStationSelector(sa);
   var yearDay = sa[0].split(",");
   fetchYear = parseInt(yearDay[0]);
   fetchDay  = parseInt(yearDay[1]);
@@ -219,6 +234,26 @@ function drawGraph()
     
     xmlhttp=new XMLHttpRequest();
     fetchStations();
+}
+
+function showStation(s) 
+{
+  fetchStation = s;
+  fetchData();
+}
+
+function createStationSelector(stations) {
+    var div = document.getElementById("stations");
+    var select = document.createElement("select");
+    select.onchange=function() { showStation(this.value); }
+
+    for (var i = 1; i < stations.length; i++) {
+      opt = document.createElement("option");
+      opt.value = stations[i];
+      opt.appendChild(document.createTextNode(stations[i]));
+      select.add(opt, null);
+    }
+    div.appendChild(select);
 }
 
 function debugMatrix(m)

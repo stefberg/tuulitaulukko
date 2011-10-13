@@ -464,9 +464,16 @@ print '<br/><br/>'
 print ' </html>'
 #dir = 'ttt/'
 dir = '/hsphere/local/home/saberg/dlarah.org/wind_data/'
+stationsFile = 'stations.txt'
+
+sf = open(dir + stationsFile, "w")
+sf.write(str(time.tm_year) + "," + str(time.tm_yday))
+sf.write("\n")
 for l in list:
+    sf.write(l[0])
+    sf.write("\n")
     f = open(dir + l[0] + "_" + str(time.tm_year) + "-" + str(time.tm_yday) + ".txt", "a")
     f.write(str(time.tm_year) + ',' + str(time.tm_mon) + ',' + str(time.tm_mday) + ',' + str(time.tm_hour) + ',' + str(time.tm_min) + ',' + str(l[1]) + ',' + str(l[2]) + ',' + str(l[3]) + ',' + str(l[4]) + ',' + str(l[5]) + ',' + str(l[6]))
     f.write("\n")
     f.close()
-
+sf.close()
