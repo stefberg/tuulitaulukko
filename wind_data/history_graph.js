@@ -126,33 +126,19 @@ function fetchData()
 {
     xmlhttp.onreadystatechange=function()
         {
-            if (xmlhttp.readyState==4/* && xmlhttp.status==200*/)
+            if (xmlhttp.readyState==4 && xmlhttp.status==200)
             {
 //                debug(xmlhttp.responseText);
                 stationData = xmlhttp.responseText;
-                parseAndDrawData();
+                drawGraph();
             }
         }
     xmlhttp.open("GET", fetchStation + "_" + fetchYear + "-" + fetchDay + ".txt", true);
     xmlhttp.send();
-    debug("xmlhttp.send");
-}
-
-function clearCanvas()
-{
-  context.fillStyle = "white";
-  context.fillRect(0 , 0 , canvas.width , canvas.height);
-  context.beginPath();
-  //  context.clearRect( 0 , 0 , canvas.width , canvas.height);
-  //  context.clearRect( 0 , 0 , 100, 100);
-  /*  var w = canvas.width;
-  canvas.width = 1;
-  canvas.width = w;*/
 }
 
 function parseAndDrawData()
 {
-    clearCanvas();
     parseData();
     
     var i;
@@ -205,9 +191,8 @@ function fetchStations()
 {
     xmlhttp.onreadystatechange=function()
         {
-            if (xmlhttp.readyState==4/* && xmlhttp.status==200*/)
+            if (xmlhttp.readyState==4 && xmlhttp.status==200)
             {
-                debug(xmlhttp.responseText);
 	      stationsList = xmlhttp.responseText;
 	      parseStationsList();
             }
@@ -218,8 +203,9 @@ function fetchStations()
 
 function drawGraph()
 {
-    canvas = document.getElementById("graphCanvas");
-    context = canvas.getContext("2d");
+    context.beginPath();
+    data = new Array();
+    context.clearRect(0 , 0 , canvas.width , canvas.height);
 
     drawAreaWidth = (canvas.width-leftMargin-rightMargin);
     drawAreaHeight = (canvas.height-bottomMargin-topMargin);
@@ -231,7 +217,13 @@ function drawGraph()
                                                      drawAreaHeight / canvas.height));
     viewMatrix = windowMatrix;
     drawBox();
-    
+    parseAndDrawData();
+}
+
+function initGraph()
+{
+    canvas = document.getElementById("graphCanvas");
+    context = canvas.getContext("2d");
     xmlhttp=new XMLHttpRequest();
     fetchStations();
 }
