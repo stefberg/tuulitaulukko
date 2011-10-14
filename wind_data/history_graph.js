@@ -16,13 +16,18 @@ var dataMaxX = 100;
 var dataMinX = 0;
 var fetchYear;
 var fetchDay;
+var fetchNumDays = 1;
+var fetchStartDay;
+var fetchEndDay;
 var fetchStation;
 var stationsList;
 
-// check also data today from yesterday 
 var stationData;
 
 var data = new Array();
+
+//var httpStatusOK = 200;
+var httpStatusOK = 0; // for testing without server
 
 function parseData() 
 {
@@ -122,18 +127,38 @@ function flipYMatrix()
                ]);
 }
 
-function fetchData()
+function startFetchData()
 {
+    fetchStartDay = fetchDay - fetchNumDays + 1;
+    fetchEndDay = fetchStartDay + fetchNumDays - 1;
+    debug("d: " + fetchNumDays + " " + fetchStartDay + " " + fetchEndDay);
+
+    data = new Array();
+    stationData = '';
+    fetchData(fetchStartDay);
+}
+
+function fetchData(day)
+{
+//    debug(day);
+    
     xmlhttp.onreadystatechange=function()
         {
-            if (xmlhttp.readyState==4 && xmlhttp.status==200)
+            if (xmlhttp.readyState==4 && xmlhttp.status == httpStatusOK)
             {
 //                debug(xmlhttp.responseText);
-                stationData = xmlhttp.responseText;
-                drawGraph();
+                stationData += xmlhttp.responseText;
+                if (day == fetchEndDay) {
+                    drawGraph();
+                } else {
+                    fetchData(day+1);
+                }
+                
             }
         }
-    xmlhttp.open("GET", fetchStation + "_" + fetchYear + "-" + fetchDay + ".txt", true);
+    var file = fetchStation + "_" + fetchYear + "-" + day + ".txt";
+//    debug(file);
+    xmlhttp.open("GET", file, true);
     xmlhttp.send();
 }
 
@@ -184,14 +209,14 @@ function parseStationsList()
   fetchYear = parseInt(yearDay[0]);
   fetchDay  = parseInt(yearDay[1]);
   fetchStation = sa[1];
-  fetchData();
+  startFetchData();
 }
 
 function fetchStations() 
 {
     xmlhttp.onreadystatechange=function()
         {
-            if (xmlhttp.readyState==4 && xmlhttp.status==200)
+            if (xmlhttp.readyState==4 && xmlhttp.status == httpStatusOK)
             {
 	      stationsList = xmlhttp.responseText;
 	      parseStationsList();
@@ -204,7 +229,6 @@ function fetchStations()
 function drawGraph()
 {
     context.beginPath();
-    data = new Array();
     context.clearRect(0 , 0 , canvas.width , canvas.height);
 
     drawAreaWidth = (canvas.width-leftMargin-rightMargin);
@@ -231,7 +255,7 @@ function initGraph()
 function showStation(s) 
 {
   fetchStation = s;
-  fetchData();
+  startFetchData();
 }
 
 function createStationSelector(stations) {
@@ -246,6 +270,12 @@ function createStationSelector(stations) {
       select.add(opt, null);
     }
     div.appendChild(select);
+}
+
+function changeDays(d) 
+{
+    fetchNumDays = parseInt(d);
+    startFetchData();
 }
 
 function debugMatrix(m)
