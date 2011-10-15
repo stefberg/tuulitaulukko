@@ -22,35 +22,49 @@ var fetchEndDay;
 var fetchStation;
 var stationsList;
 
-var stationData;
+var DF_YDAY = 0;
+var DF_MINUTE = 1;
+var DF_WIND = 2;
+var DF_WIND_MAX = 3;
 
 var data = new Array();
 
 //var httpStatusOK = 200;
 var httpStatusOK = 0; // for testing without server
 
-function parseData() 
+function trimLeading0(str) 
 {
-    var sa = stationData.split("\n");
+  var ret = str.replace(/^0+/g, '') ;
+  if (ret.length == 0) {
+    ret = '0';
+  }
+  return ret;
+}
+
+function parseData(yday, dataStr) 
+{
+    var sa = dataStr.split("\n");
     var l;
     for (l = 0; l < sa.length; l++) {
         var fields = sa[l].split(",");
         if (fields.length > 5) {
-            var time = fields[5];
-            time = time.split(":");
+   	    var time = fields[5].split(":");
             var checkHour = parseInt(fields[3]);
-            var hour = parseInt(time[0]);
-            if (hour > checkHour) {// value from the day before
-                hour -= 24;
-            }
-            var minute = parseInt(time[1]);
-            var wind = parseInt(fields[8]);
+            var hour = parseInt(trimLeading0(time[0]));
+	    if (hour - checkHour > 20) {// value from the day before
+	      hour -= 24;
+	    }
+            var minute = parseInt(trimLeading0(time[1]));
+            var wind = parseFloat(fields[8]);
+	    var minuteFromStart = (yday - fetchStartDay)*24*60 + hour*60+minute;
+	    //	    debug(l + " T: " + checkHour + " " + time[0] + " " + time[1] + " " + fields[5] + " " + hour+":"+minute);
+	    //	    debug(l + " M: " + minuteFromStart + " W: " + wind);
             var d = new Array();
-            d.push(hour*60+minute);
+	    d.push(yday);
+            d.push(minuteFromStart);
             d.push(wind);
             data.push(d);
         }
-        
     }
 }
 
@@ -85,7 +99,7 @@ function drawBox()
 
 function drawLabels() 
 {
-    context.fillStyle    = '#000000';
+    context.fillStyle = '#000000';
     var y;
     for (y = 0; y < dataMaxY; y += 6) {
         var p1 = $V([0, y, 1]);
@@ -131,10 +145,9 @@ function startFetchData()
 {
     fetchStartDay = fetchDay - fetchNumDays + 1;
     fetchEndDay = fetchStartDay + fetchNumDays - 1;
-    debug("d: " + fetchNumDays + " " + fetchStartDay + " " + fetchEndDay);
+    //    debug("d: " + fetchNumDays + " " + fetchStartDay + " " + fetchEndDay);
 
     data = new Array();
-    stationData = '';
     fetchData(fetchStartDay);
 }
 
@@ -147,13 +160,12 @@ function fetchData(day)
             if (xmlhttp.readyState==4 && xmlhttp.status == httpStatusOK)
             {
 //                debug(xmlhttp.responseText);
-                stationData += xmlhttp.responseText;
+	        parseData(day, xmlhttp.responseText);
                 if (day == fetchEndDay) {
                     drawGraph();
                 } else {
                     fetchData(day+1);
                 }
-                
             }
         }
     var file = fetchStation + "_" + fetchYear + "-" + day + ".txt";
@@ -162,24 +174,22 @@ function fetchData(day)
     xmlhttp.send();
 }
 
-function parseAndDrawData()
+function drawData(field)
 {
-    parseData();
-    
     var i;
     dataMaxX = 0;
     dataMinX = 1000000;
     dataMaxY = 0;
 
     for (i = 0; i < data.length; i++) {
-        if (data[i][0] > dataMaxX) {
-            dataMaxX = data[i][0];
+        if (data[i][DF_MINUTE] > dataMaxX) {
+            dataMaxX = data[i][DF_MINUTE];
         }
-        if (data[i][0] < dataMinX) {
-            dataMinX = data[i][0];
+        if (data[i][DF_MINUTE] < dataMinX) {
+            dataMinX = data[i][DF_MINUTE];
         }
-        if (data[i][1] > dataMaxY) {
-            dataMaxY = data[i][1];
+        if (data[i][field] > dataMaxY) {
+            dataMaxY = data[i][field];
         }
     }
 
@@ -193,9 +203,9 @@ function parseAndDrawData()
 
     for (i = 0; i < data.length; i++) {
         if (i == 0) {
-            moveTo(data[i][0], data[i][1]);
+            moveTo(data[i][DF_MINUTE], data[i][field]);
         } else {
-            lineTo(data[i][0], data[i][1]);
+            lineTo(data[i][DF_MINUTE], data[i][field]);
         }
     }
     stroke();
@@ -241,7 +251,7 @@ function drawGraph()
                                                      drawAreaHeight / canvas.height));
     viewMatrix = windowMatrix;
     drawBox();
-    parseAndDrawData();
+    drawData(DF_WIND);
 }
 
 function initGraph()
