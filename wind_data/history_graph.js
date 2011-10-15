@@ -29,8 +29,8 @@ var DF_WIND_MAX = 3;
 
 var data = new Array();
 
-//var httpStatusOK = 200;
-var httpStatusOK = 0; // for testing without server
+var httpStatusOK = 200;
+//var httpStatusOK = 0; // for testing without server
 
 function trimLeading0(str) 
 {
@@ -119,12 +119,11 @@ function drawLabels()
 	var hour3 = round(min/60/3, 0);
         var p1 = $V([hour3*60*3, 0, 1]);
         p1 = viewMatrix.multiply(p1);
-	while (hour3 >= 24/3) {
-	  hour3 -= 24/3;
-	}
         moveTo(hour3*3*60, 0);
         lineTo(hour3*3*60, dataMaxY);
-        stroke();    
+        stroke();    	while (hour3 >= 24/3) {
+	  hour3 -= 24/3;
+	}
 	context.fillText(hour3*3 + "", p1.e(1), canvas.height - 2);    
     }
 }
