@@ -112,6 +112,21 @@ function drawLabels()
     var p1 = $V([0, dataMaxY, 1]);
     p1 = viewMatrix.multiply(p1);
     context.fillText(dataMaxY + "", 2, p1.e(2));
+
+    var x;
+    for (x = dataMinX; x < dataMaxX; x += 60*3) {
+        var min = x;
+	var hour3 = round(min/60/3, 0);
+        var p1 = $V([hour3*60*3, 0, 1]);
+        p1 = viewMatrix.multiply(p1);
+	while (hour3 >= 24/3) {
+	  hour3 -= 24/3;
+	}
+        moveTo(hour3*3*60, 0);
+        lineTo(hour3*3*60, dataMaxY);
+        stroke();    
+	context.fillText(hour3*3 + "", p1.e(1), canvas.height - 2);    
+    }
 }
 
 function translateMatrix(x, y) 
@@ -303,4 +318,9 @@ function debugVector(v)
 function debug(s) 
 {
     document.getElementById('debug').innerHTML = document.getElementById('debug').innerHTML + "<br/>" + s;
+}
+
+function round(v, dec) { // to number of decimals
+    v = Math.round(v * Math.pow(10,dec)) / Math.pow(10,dec);
+    return v;
 }
