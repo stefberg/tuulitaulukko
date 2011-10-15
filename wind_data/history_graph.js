@@ -25,9 +25,11 @@ var stationsList;
 var DF_YDAY = 0;
 var DF_MINUTE = 1;
 var DF_WIND = 2;
-var DF_WIND_MAX = 3;
+var DF_WIND_MIN = 3;
+var DF_WIND_MAX = 4;
 
-var data = new Array();
+var drawSet = [DF_WIND_MIN, DF_WIND, DF_WIND_MAX];
+var lineColors = ["rgb(150, 150, 0)","rgb(0,0,0)","rgb(200, 0, 0)"];
 
 var httpStatusOK = 200;
 //var httpStatusOK = 0; // for testing without server
@@ -55,7 +57,9 @@ function parseData(yday, dataStr)
 	      hour -= 24;
 	    }
             var minute = parseInt(trimLeading0(time[1]));
+            var windMin = parseFloat(fields[7]);
             var wind = parseFloat(fields[8]);
+            var windMax = parseFloat(fields[9]);
 	    var minuteFromStart = (yday - fetchStartDay)*24*60 + hour*60+minute;
 	    //	    debug(l + " T: " + checkHour + " " + time[0] + " " + time[1] + " " + fields[5] + " " + hour+":"+minute);
 	    //	    debug(l + " M: " + minuteFromStart + " W: " + wind);
@@ -63,6 +67,8 @@ function parseData(yday, dataStr)
 	    d.push(yday);
             d.push(minuteFromStart);
             d.push(wind);
+            d.push(windMin);
+            d.push(windMax);
             data.push(d);
         }
     }
@@ -171,24 +177,25 @@ function fetchData(day)
     
     xmlhttp.onreadystatechange=function()
         {
-            if (xmlhttp.readyState==4 && xmlhttp.status == httpStatusOK)
-            {
-//                debug(xmlhttp.responseText);
-	        parseData(day, xmlhttp.responseText);
-                if (day == fetchEndDay) {
-                    drawGraph();
-                } else {
-                    fetchData(day+1);
-                }
-            }
-        }
+	  if (xmlhttp.readyState==4) {
+	    if (xmlhttp.status == httpStatusOK)
+	      {
+		//                debug(xmlhttp.responseText);
+		parseData(day, xmlhttp.responseText);
+		drawGraph();
+	      }
+	    if (day != fetchEndDay) {
+	      fetchData(day+1);
+	    }
+	  }
+	}
     var file = fetchStation + "_" + fetchYear + "-" + day + ".txt";
 //    debug(file);
     xmlhttp.open("GET", file, true);
     xmlhttp.send();
 }
 
-function drawData(field)
+function drawData()
 {
     var i;
     dataMaxX = 0;
@@ -196,15 +203,19 @@ function drawData(field)
     dataMaxY = 0;
 
     for (i = 0; i < data.length; i++) {
-        if (data[i][DF_MINUTE] > dataMaxX) {
-            dataMaxX = data[i][DF_MINUTE];
-        }
-        if (data[i][DF_MINUTE] < dataMinX) {
-            dataMinX = data[i][DF_MINUTE];
-        }
-        if (data[i][field] > dataMaxY) {
-            dataMaxY = data[i][field];
-        }
+      var d;
+      for (d = 0; d < drawSet.length; d++) {
+	var yVal = data[i][drawSet[d]];
+        if (yVal > dataMaxY) {
+	  dataMaxY = yVal;
+        }      
+      }
+      if (data[i][DF_MINUTE] > dataMaxX) {
+	dataMaxX = data[i][DF_MINUTE];
+      }
+      if (data[i][DF_MINUTE] < dataMinX) {
+	dataMinX = data[i][DF_MINUTE];
+      }
     }
 
     dataMatrix = scaleMatrix(drawAreaWidth / (dataMaxX - dataMinX),
@@ -214,15 +225,20 @@ function drawData(field)
     viewMatrix = windowMatrix.multiply(dataMatrix);
 
     drawLabels();
-
-    for (i = 0; i < data.length; i++) {
+    var d;
+    for (d = 0; d < drawSet.length; d++) {
+      context.beginPath();
+      for (i = 0; i < data.length; i++) {
         if (i == 0) {
-            moveTo(data[i][DF_MINUTE], data[i][field]);
+	  moveTo(data[i][DF_MINUTE], data[i][drawSet[d]]);
         } else {
-            lineTo(data[i][DF_MINUTE], data[i][field]);
+	  lineTo(data[i][DF_MINUTE], data[i][drawSet[d]]);
         }
+      }
+      context.strokeStyle = lineColors[d];
+      stroke();
     }
-    stroke();
+    context.strokeStyle = "black";
 }
 
 function parseStationsList()
@@ -265,7 +281,7 @@ function drawGraph()
                                                      drawAreaHeight / canvas.height));
     viewMatrix = windowMatrix;
     drawBox();
-    drawData(DF_WIND);
+    drawData();
 }
 
 function initGraph()
