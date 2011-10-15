@@ -410,7 +410,7 @@ print 'table.lboardsnip tr.foot td {background-color:#AAAAA0;font-weight:normal;
 print 'table.lboardsnip .lal {padding-left:4px;}'
 print '.larr {background:url(http://i.pga.com/pga/images/pgachampionship/img/icon_linkarrR.gif) no-repeat;padding-left:6px;display:inline;font-size:10px;font-weight:bold; }'
 print '.lal {text-align:left;}'
-print 'a:link, a:visited, a:hover, a:active {font-weight:bold;text-decoration:none;color:#3D3D33;}'
+print 'a:link, a:visited, a:hover, a:active {text-decoration:none;color:#3D3D33;}'
 print 'a:hover {text-decoration:underline;}'
 print 'td {white-space:nowrap}'
 print '    </style>'
@@ -450,7 +450,7 @@ for l in list:
     odd = 1 - odd
     print '	  <td align="left"><a href="' + str(l[7]) + '"><b>' + str(l[0]) + '</b></a></td>'
     print '	  <td>' + str(l[1]) + '</td>'
-    print '	  <td>' + str(l[2]) + '</td>'
+    print '	  <td><a href="wind_data/index.html#' + str(l[0]) + '">' + str(l[2]) + '</a></td>'
     print '	  <td>' + str(l[4]) + '</td>'
     print '	  <td>' + str(l[5]) + '</td>'
     print '	  <td>' + str(l[6]) + '&deg;</td>'
@@ -473,7 +473,7 @@ for l in list:
     sf.write(l[0])
     sf.write("\n")
     f = open(dir + l[0] + "_" + str(time.tm_year) + "-" + str(time.tm_yday) + ".txt", "a")
-    f.write(str(time.tm_year) + ',' + str(time.tm_mon) + ',' + str(time.tm_mday) + ',' + str(time.tm_hour) + ',' + str(time.tm_min) + ',' + str(l[1]) + ',' + str(l[2]) + ',' + str(l[3]) + ',' + str(l[4]) + ',' + str(l[5]) + ',' + str(l[6]))
+    f.write(str(time.tm_year) + ',' + str(time.tm_mon) + ',' + str(time.tm_mday) + ',' + str(time.tm_hour) + ',' + str(time.tm_min) + ',' + str(l[1]) + ',' + str(l[2]) + ',' + str(l[3]) + ',' + str(l[4]) + ',' + str(l[5]) + ',' + str(l[6].replace(',','.')))
     f.write("\n")
     f.close()
 sf.close()

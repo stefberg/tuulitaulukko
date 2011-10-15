@@ -248,7 +248,9 @@ function parseStationsList()
   var yearDay = sa[0].split(",");
   fetchYear = parseInt(yearDay[0]);
   fetchDay  = parseInt(yearDay[1]);
-  fetchStation = sa[1];
+  if (fetchStation == '') {
+    fetchStation = sa[1];
+  }
   startFetchData();
 }
 
@@ -289,6 +291,7 @@ function initGraph()
     canvas = document.getElementById("graphCanvas");
     context = canvas.getContext("2d");
     xmlhttp=new XMLHttpRequest();
+    fetchStation = window.location.hash.replace('#', '');
     fetchStations();
 }
 
@@ -307,6 +310,9 @@ function createStationSelector(stations) {
       opt = document.createElement("option");
       opt.value = stations[i];
       opt.appendChild(document.createTextNode(stations[i]));
+      if (fetchStation == stations[i]) {
+	opt.selected = true;
+      }
       select.add(opt, null);
     }
     div.appendChild(select);
