@@ -95,6 +95,8 @@ function stroke()
 
 function drawBox() 
 {
+    context.beginPath();
+    context.strokeStyle = '#000000';
     moveTo(0, 0);
     lineTo(drawAreaWidth, 0);
     lineTo(drawAreaWidth, drawAreaHeight);
@@ -105,8 +107,20 @@ function drawBox()
 
 function drawLabels() 
 {
+    context.beginPath();
     context.fillStyle = '#000000';
+    context.strokeStyle = 'rgb(220, 220, 220)';
     var y;
+    for (y = 2; y < dataMaxY; y += 2) {
+        var p1 = $V([0, y, 1]);
+        p1 = viewMatrix.multiply(p1);
+        context.fillText(y + "", 2, p1.e(2));
+        moveTo(dataMinX, y);
+        lineTo(dataMaxX, y);
+        stroke();
+    }
+    context.beginPath();
+    context.strokeStyle = '#000000';
     for (y = 0; y < dataMaxY; y += 6) {
         var p1 = $V([0, y, 1]);
         p1 = viewMatrix.multiply(p1);
@@ -310,7 +324,7 @@ function createStationSelector(stations) {
       opt = document.createElement("option");
       opt.value = stations[i];
       opt.appendChild(document.createTextNode(stations[i]));
-      if (fetchStation == stations[i]) {
+      if (fetchStation != '' && fetchStation == stations[i]) {
 	opt.selected = true;
       }
       select.add(opt, null);
