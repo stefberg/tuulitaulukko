@@ -27,12 +27,15 @@ var DF_MINUTE = 1;
 var DF_WIND = 2;
 var DF_WIND_MIN = 3;
 var DF_WIND_MAX = 4;
+var DF_TEMP = 5;
 
-var drawSet = [DF_WIND_MIN, DF_WIND, DF_WIND_MAX];
+var drawSetTemp = [DF_TEMP];
+var drawSetWind = [DF_WIND_MIN, DF_WIND, DF_WIND_MAX];
+var drawSet = drawSetWind;
+
 var lineColors = ["rgb(150, 150, 0)","rgb(0,0,0)","rgb(200, 0, 0)"];
 
 var httpStatusOK = 200;
-//var httpStatusOK = 0; // for testing without server
 
 function trimLeading0(str) 
 {
@@ -60,6 +63,7 @@ function parseData(yday, dataStr)
             var windMin = parseFloat(fields[7]);
             var wind = parseFloat(fields[8]);
             var windMax = parseFloat(fields[9]);
+            var temp = parseFloat(fields[10]);
 	    var minuteFromStart = (yday - fetchStartDay)*24*60 + hour*60+minute;
 	    //	    debug(l + " T: " + checkHour + " " + time[0] + " " + time[1] + " " + fields[5] + " " + hour+":"+minute);
 	    //	    debug(l + " M: " + minuteFromStart + " W: " + wind);
@@ -69,6 +73,7 @@ function parseData(yday, dataStr)
             d.push(wind);
             d.push(windMin);
             d.push(windMax);
+            d.push(temp);
             data.push(d);
         }
     }
@@ -302,6 +307,9 @@ function drawGraph()
 
 function initGraph()
 {
+  if (window.location.host == '') {
+    httpStatusOK = 0;
+  }
     canvas = document.getElementById("graphCanvas");
     context = canvas.getContext("2d");
     xmlhttp=new XMLHttpRequest();
@@ -336,6 +344,17 @@ function changeDays(d)
 {
     fetchNumDays = parseInt(d);
     startFetchData();
+}
+
+function changeDrawSet(d)
+{
+  if (d == 0) {
+    drawSet = drawSetWind;
+  }
+  if (d == 1) {
+    drawSet = drawSetTemp;
+  }
+  drawGraph();
 }
 
 function debugMatrix(m)
