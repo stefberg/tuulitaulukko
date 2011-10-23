@@ -10,7 +10,7 @@ var drawAreaHeight;
 var leftMargin = 20;
 var bottomMargin = 20;
 var rightMargin = 0;
-var topMargin = 8;
+var topMargin = 4;
 var dataMaxY = 20;
 var dataMaxX = 100;
 var dataMinX = 0;
@@ -21,6 +21,7 @@ var fetchStartDay;
 var fetchEndDay;
 var fetchStation;
 var stationsList;
+var dataDir = './';
 
 var DF_YDAY = 0;
 var DF_MINUTE = 1;
@@ -228,7 +229,7 @@ function fetchData(day)
 	    }
 	  }
 	}
-    var file = fetchStation + "_" + fetchYear + "-" + day + ".txt";
+    var file = dataDir + fetchStation + "_" + fetchYear + "-" + day + ".txt";
 //    debug(file);
     xmlhttp.open("GET", file, true);
     xmlhttp.send();
@@ -290,30 +291,32 @@ function drawData()
     context.strokeStyle = "black";
 }
 
-function parseStationsList()
+function parseStationsList(doFirst)
 {
   var sa = stationsList.split("\n");
   createStationSelector(sa);
   var yearDay = sa[0].split(",");
   fetchYear = parseInt(yearDay[0]);
   fetchDay  = parseInt(yearDay[1]);
-  if (fetchStation == '') {
-    fetchStation = sa[1];
+  if (doFirst) {
+    if (fetchStation == '') {
+      fetchStation = sa[1];
+    }
+    startFetchData();
   }
-  startFetchData();
 }
 
-function fetchStations() 
+function fetchStations(doFirst) 
 {
     xmlhttp.onreadystatechange=function()
         {
             if (xmlhttp.readyState==4 && xmlhttp.status == httpStatusOK)
             {
 	      stationsList = xmlhttp.responseText;
-	      parseStationsList();
+	      parseStationsList(doFirst);
             }
         }
-    xmlhttp.open("GET", "stations.txt", true);
+    xmlhttp.open("GET", dataDir + "stations.txt", true);
     xmlhttp.send();
 }
 
@@ -335,7 +338,7 @@ function drawGraph()
     drawData();
 }
 
-function initGraph()
+function initGraph(doFirst)
 {
   if (window.location.host == '') {
     httpStatusOK = 0;
@@ -344,30 +347,43 @@ function initGraph()
     context = canvas.getContext("2d");
     xmlhttp=new XMLHttpRequest();
     fetchStation = window.location.hash.replace('#', '');
-    fetchStations();
+    fetchStations(doFirst);
 }
 
-function showStation(s) 
+function showStation(s, d)
 {
-  fetchStation = s;
-  startFetchData();
+    if (fetchStation != s) {
+      fetchStation = s;
+      startFetchData();
+    }
+    if (d != -1) {
+      var i;
+      if (d == 0) { i = 'm/s'; }
+      if (d == 1) { i = 'temp'; }
+      if (d == 2) { i = 'dir'; }
+      document.getElementById('station_name').innerHTML = s + ' ' + i;
+      document.getElementById('days').style.display = "block";
+      changeDrawSet(d);
+    }
 }
 
 function createStationSelector(stations) {
     var div = document.getElementById("stations");
-    var select = document.createElement("select");
-    select.onchange=function() { showStation(this.value); }
+    if (div != null) {
+      var select = document.createElement("select");
+      select.onchange=function() { showStation(this.value, -1); }
 
-    for (var i = 1; i < stations.length; i++) {
-      opt = document.createElement("option");
-      opt.value = stations[i];
-      opt.appendChild(document.createTextNode(stations[i]));
-      if (fetchStation != '' && fetchStation == stations[i]) {
-	opt.selected = true;
+      for (var i = 1; i < stations.length; i++) {
+	opt = document.createElement("option");
+	opt.value = stations[i];
+	opt.appendChild(document.createTextNode(stations[i]));
+	if (fetchStation != '' && fetchStation == stations[i]) {
+	  opt.selected = true;
+	}
+	select.add(opt, null);
       }
-      select.add(opt, null);
+      div.appendChild(select);
     }
-    div.appendChild(select);
 }
 
 function changeDays(d) 
@@ -388,6 +404,11 @@ function changeDrawSet(d)
     drawSet = drawSetWindDir;
   }
   drawGraph();
+}
+
+function setDataDir(d) 
+{
+  dataDir = d;
 }
 
 function debugMatrix(m)
