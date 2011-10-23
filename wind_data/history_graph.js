@@ -49,10 +49,15 @@ function trimLeading0(str)
   return ret;
 }
 
+function trim(str)
+{
+  return str.replace(/^ +/g, '') ;
+}
+
 var WINDMAP = {"pohjois": 0, "etelä": 180, "itä": 90, "länsi": 270, "luoteis": 315, "kaakkois": 135, "lounais": 225, "koillis": 45};
 
 function parseWindDir(str) {
-  str = str.toLowerCase();
+  str = trim(str.toLowerCase());
   if (str.charAt(0) >= '0' && str.charAt(0) <= '9') {
     return parseFloat(str);
   }
