@@ -295,6 +295,7 @@ class YyteriParser(HTMLParser):
             if len(tm) > 2:
                 self.time = tm[2]
             self.wind_dir = self.table[self.row][2]
+            self.wind_low = self.table[self.row][4]
             self.wind_speed = self.table[self.row][5]
             self.wind_max = self.table[self.row][6]
             self.temp = self.table[self.row][7]

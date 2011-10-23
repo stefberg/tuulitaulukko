@@ -27,13 +27,15 @@ var DF_MINUTE = 1;
 var DF_WIND = 2;
 var DF_WIND_MIN = 3;
 var DF_WIND_MAX = 4;
-var DF_TEMP = 5;
+var DF_WIND_DIR = 5;
+var DF_TEMP = 6;
 
 var drawSetTemp = [DF_TEMP];
-var drawSetWind = [DF_WIND_MIN, DF_WIND, DF_WIND_MAX];
+var drawSetWind = [DF_WIND_MAX, DF_WIND, DF_WIND_MIN];
+var drawSetWindDir = [DF_WIND_DIR];
 var drawSet = drawSetWind;
 
-var lineColors = ["rgb(150, 150, 0)","rgb(0,0,0)","rgb(200, 0, 0)"];
+var lineColors = ["rgb(200, 0, 0)", "rgb(0,0,0)", "rgb(190, 190, 0)"];
 
 var httpStatusOK = 200;
 
@@ -44,6 +46,16 @@ function trimLeading0(str)
     ret = '0';
   }
   return ret;
+}
+
+var WINDMAP = {"pohjois": 0, "etelä": 180, "itä": 90, "länsi": 270, "luoteis": 315, "kaakkois": 135, "lounais": 225, "koillis": 45};
+
+function parseWindDir(str) {
+  str = str.toLowerCase();
+  if (str.charAt(0) >= '0' && str.charAt(0) <= '9') {
+    return parseFloat(str);
+  }
+  return WINDMAP[str];
 }
 
 function parseData(yday, dataStr) 
@@ -60,6 +72,7 @@ function parseData(yday, dataStr)
 	      hour -= 24;
 	    }
             var minute = parseInt(trimLeading0(time[1]));
+            var windDir = parseWindDir(fields[6]);
             var windMin = parseFloat(fields[7]);
             var wind = parseFloat(fields[8]);
             var windMax = parseFloat(fields[9]);
@@ -73,6 +86,7 @@ function parseData(yday, dataStr)
             d.push(wind);
             d.push(windMin);
             d.push(windMax);
+            d.push(windDir);
             d.push(temp);
             data.push(d);
         }
@@ -115,8 +129,14 @@ function drawLabels()
     context.beginPath();
     context.fillStyle = '#000000';
     context.strokeStyle = 'rgb(220, 220, 220)';
+    var grid1 = 2;
+    var grid2 = 6;
+    if (dataMaxY > 200) {
+      grid1 = 45;
+      grid2 = 90;
+    }
     var y;
-    for (y = 2; y < dataMaxY; y += 2) {
+    for (y = 0; y < dataMaxY; y += grid1) {
         var p1 = $V([0, y, 1]);
         p1 = viewMatrix.multiply(p1);
         context.fillText(y + "", 2, p1.e(2));
@@ -126,7 +146,7 @@ function drawLabels()
     }
     context.beginPath();
     context.strokeStyle = '#000000';
-    for (y = 0; y < dataMaxY; y += 6) {
+    for (y = 0; y < dataMaxY; y += grid2) {
         var p1 = $V([0, y, 1]);
         p1 = viewMatrix.multiply(p1);
         context.fillText(y + "", 2, p1.e(2));
@@ -236,7 +256,9 @@ function drawData()
 	dataMinX = data[i][DF_MINUTE];
       }
     }
-
+    if (drawSet == drawSetWindDir) {
+      dataMaxY = 360;
+    }
     dataMatrix = scaleMatrix(drawAreaWidth / (dataMaxX - dataMinX),
                              drawAreaHeight/ dataMaxY);
     dataMatrix = dataMatrix.multiply(translateMatrix(-dataMinX, 0));
@@ -244,15 +266,23 @@ function drawData()
     viewMatrix = windowMatrix.multiply(dataMatrix);
 
     drawLabels();
+    var yVal;
+    var prevyVal;
     var d;
     for (d = 0; d < drawSet.length; d++) {
       context.beginPath();
       for (i = 0; i < data.length; i++) {
+	yVal = data[i][drawSet[d]];
         if (i == 0) {
-	  moveTo(data[i][DF_MINUTE], data[i][drawSet[d]]);
+	  moveTo(data[i][DF_MINUTE], yVal);
         } else {
-	  lineTo(data[i][DF_MINUTE], data[i][drawSet[d]]);
+	  //	  if (Math.abs(yVal - prevyVal) > 200) {
+	  //	    moveTo(data[i][DF_MINUTE], yVal);
+	  //	  } else {
+	    lineTo(data[i][DF_MINUTE], yVal);
+	    //	  }
         }
+	prevyVal = yVal;
       }
       context.strokeStyle = lineColors[d];
       stroke();
@@ -353,6 +383,9 @@ function changeDrawSet(d)
   }
   if (d == 1) {
     drawSet = drawSetTemp;
+  }
+  if (d == 2) {
+    drawSet = drawSetWindDir;
   }
   drawGraph();
 }
