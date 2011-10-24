@@ -86,7 +86,7 @@ function parseData(yday, dataStr)
         var month = parseInt(fields[1]);
         var day = parseInt(fields[2]);
         var hour = parseInt(fields[3]);
-        var date = new Date(year, month, day, hour, 0, 0, 0);
+        var date = new Date(year, month-1, day, hour, 0, 0, 0);
         firstWeekDay = date.getDay();
       }
       var minute = parseInt(trimLeading0(time[1]));
