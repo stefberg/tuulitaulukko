@@ -130,6 +130,49 @@ function drawBox()
     stroke();
 }
 
+function fillRect(x1, y1, w, h)
+{
+    var p1 = $V([x1, y1, 1]);
+    p1 = viewMatrix.multiply(p1);
+    var p2 = $V([x1+w, y1+h, 1]);
+    p2 = viewMatrix.multiply(p2);
+    context.fillRect(p1.e(1), p1.e(2), p2.e(1)-p1.e(1), p2.e(2)-p1.e(2));
+}
+
+var sunset = 21*60;
+var sunrise = 6*60;
+
+function nextSunset(minute)
+{
+  var d = round(minute/(60*24), 0);
+  var dayMinute = minute - d*60*24;
+  if (dayMinute < sunrise) {
+    return minute;
+  }
+  return sunset + d * 60*24;
+}
+
+function nextSunrise(minute)
+{
+  var d = round(minute/(60*24), 0);
+  var dayMinute = minute - d*60*24;
+  return sunrise + d * 60*24;
+}
+
+function drawBackground()
+{
+  context.beginPath();
+  context.fillStyle = 'rgb(240, 240, 240)';
+  var ss = dataMinX+1;
+  var sr = dataMinX;
+  do {
+    ss = nextSunset(ss);
+    sr = nextSunrise(ss);
+    fillRect(ss, 0, sr-ss, dataMaxY);
+    ss = sr + 1;
+  } while (sr < dataMaxX);
+}
+
 function drawLabels() 
 {
     context.beginPath();
@@ -167,15 +210,16 @@ function drawLabels()
     var x;
     for (x = dataMinX; x < dataMaxX; x += 60*3) {
         var min = x;
-	var hour3 = round(min/60/3, 0);
+        var hour3 = round(min/60/3, 0);
         var p1 = $V([hour3*60*3, 0, 1]);
         p1 = viewMatrix.multiply(p1);
         moveTo(hour3*3*60, 0);
         lineTo(hour3*3*60, dataMaxY);
-        stroke();    	while (hour3 >= 24/3) {
-	  hour3 -= 24/3;
-	}
-	context.fillText(hour3*3 + "", p1.e(1), canvas.height - 2);    
+        stroke();
+        while (hour3 >= 24/3) {
+          hour3 -= 24/3;
+        }
+        context.fillText(hour3*3 + "", p1.e(1), canvas.height - 2);    
     }
 }
 
@@ -240,7 +284,7 @@ function fetchData(day)
     xmlhttp.send();
 }
 
-function drawData()
+function calcRange()
 {
     var i;
     dataMaxX = 0;
@@ -250,16 +294,16 @@ function drawData()
     for (i = 0; i < data.length; i++) {
       var d;
       for (d = 0; d < drawSet.length; d++) {
-	var yVal = data[i][drawSet[d]];
+        var yVal = data[i][drawSet[d]];
         if (yVal > dataMaxY) {
-	  dataMaxY = yVal;
+          dataMaxY = yVal;
         }      
       }
       if (data[i][DF_MINUTE] > dataMaxX) {
-	dataMaxX = data[i][DF_MINUTE];
+        dataMaxX = data[i][DF_MINUTE];
       }
       if (data[i][DF_MINUTE] < dataMinX) {
-	dataMinX = data[i][DF_MINUTE];
+        dataMinX = data[i][DF_MINUTE];
       }
     }
     if (drawSet == drawSetWindDir) {
@@ -270,25 +314,27 @@ function drawData()
     dataMatrix = dataMatrix.multiply(translateMatrix(-dataMinX, 0));
 
     viewMatrix = windowMatrix.multiply(dataMatrix);
+}
 
-    drawLabels();
+function drawData()
+{
     var yVal;
     var prevyVal;
     var d;
     for (d = 0; d < drawSet.length; d++) {
       context.beginPath();
       for (i = 0; i < data.length; i++) {
-	yVal = data[i][drawSet[d]];
+        yVal = data[i][drawSet[d]];
         if (i == 0) {
-	  moveTo(data[i][DF_MINUTE], yVal);
+          moveTo(data[i][DF_MINUTE], yVal);
         } else {
-	  //	  if (Math.abs(yVal - prevyVal) > 200) {
-	  //	    moveTo(data[i][DF_MINUTE], yVal);
-	  //	  } else {
-	    lineTo(data[i][DF_MINUTE], yVal);
-	    //	  }
+              //	  if (Math.abs(yVal - prevyVal) > 200) {
+              //	    moveTo(data[i][DF_MINUTE], yVal);
+              //	  } else {
+          lineTo(data[i][DF_MINUTE], yVal);
+              //	  }
         }
-	prevyVal = yVal;
+        prevyVal = yVal;
       }
       context.strokeStyle = lineColors[d];
       stroke();
@@ -315,11 +361,11 @@ function fetchStations(doFirst)
 {
     xmlhttp.onreadystatechange=function()
         {
-            if (xmlhttp.readyState==4 && xmlhttp.status == httpStatusOK)
-            {
-	      stationsList = xmlhttp.responseText;
-	      parseStationsList(doFirst);
-            }
+          if (xmlhttp.readyState==4 && xmlhttp.status == httpStatusOK)
+          {
+            stationsList = xmlhttp.responseText;
+            parseStationsList(doFirst);
+          }
         }
     xmlhttp.open("GET", dataDir + "stations.txt", true);
     xmlhttp.send();
@@ -340,6 +386,9 @@ function drawGraph()
                                                      drawAreaHeight / canvas.height));
     viewMatrix = windowMatrix;
     drawBox();
+    calcRange();
+    drawBackground();
+    drawLabels();
     drawData();
 }
 
