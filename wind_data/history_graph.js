@@ -20,6 +20,7 @@ var fetchNumDays = 1;
 var fetchStartDay;
 var fetchEndDay;
 var fetchStation;
+var firstWeekDay;
 var stationsList;
 var dataDir = './';
 
@@ -37,6 +38,9 @@ var drawSetWindDir = [DF_WIND_DIR];
 var drawSet = drawSetWind;
 
 var lineColors = ["rgb(200, 0, 0)", "rgb(0,0,0)", "rgb(190, 190, 0)"];
+
+//var weekDays = ["su", "mo", "tu", "we", "th", "fr", "sa"];
+var weekDays = ["su", "ma", "ti", "ke", "to", "pe", "la"];
 
 var httpStatusOK = 200;
 
@@ -66,37 +70,45 @@ function parseWindDir(str) {
 
 function parseData(yday, dataStr) 
 {
-    var sa = dataStr.split("\n");
-    var l;
-    for (l = 0; l < sa.length; l++) {
-        var fields = sa[l].split(",");
-        if (fields.length > 5) {
-   	    var time = fields[5].split(":");
-            var checkHour = parseInt(fields[3]);
-            var hour = parseInt(trimLeading0(time[0]));
-	    if (hour - checkHour > 20) {// value from the day before
-	      hour -= 24;
-	    }
-            var minute = parseInt(trimLeading0(time[1]));
-            var windDir = parseWindDir(fields[6]);
-            var windMin = parseFloat(fields[7]);
-            var wind = parseFloat(fields[8]);
-            var windMax = parseFloat(fields[9]);
-            var temp = parseFloat(fields[10]);
-	    var minuteFromStart = (yday - fetchStartDay)*24*60 + hour*60+minute;
-	    //	    debug(l + " T: " + checkHour + " " + time[0] + " " + time[1] + " " + fields[5] + " " + hour+":"+minute);
-	    //	    debug(l + " M: " + minuteFromStart + " W: " + wind);
-            var d = new Array();
-	    d.push(yday);
-            d.push(minuteFromStart);
-            d.push(wind);
-            d.push(windMin);
-            d.push(windMax);
-            d.push(windDir);
-            d.push(temp);
-            data.push(d);
-        }
+  var sa = dataStr.split("\n");
+  var l;
+  for (l = 0; l < sa.length; l++) {
+    var fields = sa[l].split(",");
+    if (fields.length > 5) {
+      var time = fields[5].split(":");
+      var checkHour = parseInt(fields[3]);
+      var hour = parseInt(trimLeading0(time[0]));
+      if (hour - checkHour > 20) {// value from the day before
+        hour -= 24;
+      }
+      if (l == 0 && data.length == 0) {
+        var year = parseInt(fields[0]);
+        var month = parseInt(fields[1]);
+        var day = parseInt(fields[2]);
+        var hour = parseInt(fields[3]);
+        var date = new Date(year, month, day, hour, 0, 0, 0);
+        firstWeekDay = date.getDay();
+      }
+      var minute = parseInt(trimLeading0(time[1]));
+      var windDir = parseWindDir(fields[6]);
+      var windMin = parseFloat(fields[7]);
+      var wind = parseFloat(fields[8]);
+      var windMax = parseFloat(fields[9]);
+      var temp = parseFloat(fields[10]);
+      var minuteFromStart = (yday - fetchStartDay)*24*60 + hour*60+minute;
+          //	    debug(l + " T: " + checkHour + " " + time[0] + " " + time[1] + " " + fields[5] + " " + hour+":"+minute);
+          //	    debug(l + " M: " + minuteFromStart + " W: " + wind);
+      var d = new Array();
+      d.push(yday);
+      d.push(minuteFromStart);
+      d.push(wind);
+      d.push(windMin);
+      d.push(windMax);
+      d.push(windDir);
+      d.push(temp);
+      data.push(d);
     }
+  }
 }
 
 function moveTo(x, y)
@@ -221,6 +233,17 @@ function drawLabels()
         }
         context.fillText(hour3*3 + "", p1.e(1), canvas.height - 2);    
     }
+    var d = firstWeekDay;
+    for (x = 0; x < dataMaxX; x += 24*60) {
+      var p1 = $V([x+6*60, 0, 1]);
+      p1 = viewMatrix.multiply(p1);
+      context.fillText(weekDays[d], p1.e(1), 15);
+      d++;
+      if (d > 6) {
+        d = 0;
+      }
+    }
+    
 }
 
 function translateMatrix(x, y) 
