@@ -189,7 +189,12 @@ function drawBackground()
   do {
     ss = nextSunset(ss);
     sr = nextSunrise(ss);
-    fillRect(ss, 0, sr-ss, dataMaxY);
+    if (sr < dataMaxX) {
+      if (ss > dataMaxX) {
+	ss = dataMaxX;
+      }
+      fillRect(ss, 0, sr-ss, dataMaxY);
+    }
     ss = sr + 1;
   } while (sr < dataMaxX);
 }
