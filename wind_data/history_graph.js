@@ -448,6 +448,7 @@ function initGraph(doFirst)
     context = canvas.getContext("2d");
     xmlhttp=new XMLHttpRequest();
     fetchStation = window.location.hash.replace('#', '');
+    fetchNumDays = parseInt(document.getElementById('days').value);
     fetchStations(doFirst);
 }
 
