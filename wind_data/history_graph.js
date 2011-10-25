@@ -219,8 +219,12 @@ function drawLabels()
     p1 = viewMatrix.multiply(p1);
     context.fillText(dataMaxY + "", 2, p1.e(2));
 
+    var gridX = 60*3;
+    if ((dataMaxX - dataMinX) / (24*60) > 5) {
+      gridX = 60*12;
+    }
     var x;
-    for (x = dataMinX; x < dataMaxX; x += 60*3) {
+    for (x = dataMinX; x < dataMaxX; x += gridX) {
         var min = x;
         var hour3 = round(min/60/3, 0);
         var p1 = $V([hour3*60*3, 0, 1]);
