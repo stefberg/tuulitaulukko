@@ -19,6 +19,7 @@ var fetchDay;
 var fetchNumDays = 1;
 var fetchStartDay;
 var fetchEndDay;
+var lastFetchedDay;
 var fetchStation;
 var firstWeekDay;
 var stationsList;
@@ -68,6 +69,14 @@ function parseWindDir(str) {
   return WINDMAP[str];
 }
 
+function nona(s) 
+{
+    if (s == 'na') {
+        return '0';
+    }
+    return s;
+}
+
 function parseData(yday, dataStr) 
 {
   var sa = dataStr.split("\n");
@@ -90,11 +99,11 @@ function parseData(yday, dataStr)
         firstWeekDay = date.getDay();
       }
       var minute = parseInt(trimLeading0(time[1]));
-      var windDir = parseWindDir(fields[6]);
-      var windMin = parseFloat(fields[7]);
-      var wind = parseFloat(fields[8]);
-      var windMax = parseFloat(fields[9]);
-      var temp = parseFloat(fields[10]);
+      var windDir = parseWindDir(nona(fields[6]));
+      var windMin = parseFloat(nona(fields[7]));
+      var wind = parseFloat(nona(fields[8]));
+      var windMax = parseFloat(nona(fields[9]));
+      var temp = parseFloat(nona(fields[10]));
       var minuteFromStart = (yday - fetchStartDay)*24*60 + hour*60+minute;
           //	    debug(l + " T: " + checkHour + " " + time[0] + " " + time[1] + " " + fields[5] + " " + hour+":"+minute);
           //	    debug(l + " M: " + minuteFromStart + " W: " + wind);
@@ -281,6 +290,7 @@ function startFetchData()
 {
     fetchStartDay = fetchDay - fetchNumDays + 1;
     fetchEndDay = fetchStartDay + fetchNumDays - 1;
+    lastFetchedDay = -1;
     //    debug("d: " + fetchNumDays + " " + fetchStartDay + " " + fetchEndDay);
 
     data = new Array();
@@ -298,6 +308,7 @@ function fetchData(day)
 	      {
 		//                debug(xmlhttp.responseText);
 		parseData(day, xmlhttp.responseText);
+        lastFetchedDay = day;
 		drawGraph();
 	      }
 	    if (day != fetchEndDay) {
@@ -332,6 +343,10 @@ function calcRange()
       if (data[i][DF_MINUTE] < dataMinX) {
         dataMinX = data[i][DF_MINUTE];
       }
+    }
+    if (lastFetchedDay < fetchEndDay) {
+        var date = new Date();
+        dataMaxX = dataMinX + (fetchEndDay - fetchStartDay)*60*24 + date.getHours()*60 + date.getMinutes();
     }
     if (drawSet == drawSetWindDir) {
       dataMaxY = 360;
