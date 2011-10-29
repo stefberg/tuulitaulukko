@@ -504,8 +504,17 @@ sf.write("\n")
 for l in list:
     sf.write(l[0])
     sf.write("\n")
-    f = open(dir + l[0] + "_" + str(time.tm_year) + "-" + str(time.tm_yday) + ".txt", "a")
-    f.write(str(time.tm_year) + ',' + str(time.tm_mon) + ',' + str(time.tm_mday) + ',' + str(time.tm_hour) + ',' + str(time.tm_min) + ',' + str(l[1]) + ',' + str(l[2]) + ',' + str(l[3]) + ',' + str(l[4]) + ',' + str(l[5]) + ',' + str(l[6].replace(',','.')))
-    f.write("\n")
+    datafile = dir + l[0] + "_" + str(time.tm_year) + "-" + str(time.tm_yday) + ".txt"
+    lastline = []
+    if os.path.exists(datafile):
+        f = open(datafile, "r+")
+        for line in f:
+            if len(line.split(',')) > 6:
+                lastline = line.split(',')
+    else:
+        f = open(datafile, "w")
+    if len(lastline) == 0 or lastline[5] != l[1]:
+        f.write(str(time.tm_year) + ',' + str(time.tm_mon) + ',' + str(time.tm_mday) + ',' + str(time.tm_hour) + ',' + str(time.tm_min) + ',' + str(l[1]) + ',' + str(l[2]) + ',' + str(l[3]) + ',' + str(l[4]) + ',' + str(l[5]) + ',' + str(l[6].replace(',','.')))
+        f.write("\n")
     f.close()
 sf.close()
