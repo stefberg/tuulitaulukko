@@ -16,7 +16,7 @@ var dataMaxX = 100;
 var dataMinX = 0;
 var fetchYear;
 var fetchDay;
-var fetchNumDays = 1;
+var fetchNumDays = 2;
 var fetchStartDay;
 var fetchEndDay;
 var lastFetchedDay;
