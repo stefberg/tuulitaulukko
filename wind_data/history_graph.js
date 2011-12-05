@@ -389,6 +389,34 @@ function drawData()
     context.strokeStyle = "black";
 }
 
+function drawAverage()
+{
+    var averageY = 0;
+    var d;
+    var x = 0;
+    var xVal = data[0][DF_MINUTE];
+    for (i = 0; i < data.length; i++) {
+        var yVal = 0;
+        if (drawSet == drawSetWind) {
+            yVal = data[i][DF_WIND];
+        } else {
+            yVal = data[i][drawSet[0]];
+        }
+        averageY += yVal*(data[i][DF_MINUTE]-xVal);
+        x += (data[i][DF_MINUTE]-xVal);
+        xVal = data[i][DF_MINUTE];
+    }
+    averageY /= (x+1);
+
+    context.beginPath();
+    moveTo(dataMinX, averageY);
+    lineTo(dataMaxX, averageY);
+    context.strokeStyle = "rgb(180, 220, 220)";
+    stroke();
+    
+    context.strokeStyle = "black";
+}
+
 function parseStationsList(doFirst)
 {
   var sa = stationsList.split("\n");
@@ -437,6 +465,7 @@ function drawGraph()
     drawBackground();
     drawLabels();
     drawData();
+    drawAverage();
 }
 
 function initGraph(doFirst)
