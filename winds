@@ -6,7 +6,7 @@ export TZ="Europe/Helsinki"
 
 [ $? -eq 0 ] && cp /hsphere/local/home/saberg/dlarah.org/winds_tmp.html /hsphere/local/home/saberg/dlarah.org/winds.html
 
-/hsphere/local/home/saberg/dlarah.org/cgi-bin/winds_ee.py > /hsphere/local/home/saberg/dlarah.org/winds_ee_tmp.html
+#/hsphere/local/home/saberg/dlarah.org/cgi-bin/winds_ee.py > /hsphere/local/home/saberg/dlarah.org/winds_ee_tmp.html
 
-[ $? -eq 0 ] && cp /hsphere/local/home/saberg/dlarah.org/winds_ee_tmp.html /hsphere/local/home/saberg/dlarah.org/winds_ee.html
+#[ $? -eq 0 ] && cp /hsphere/local/home/saberg/dlarah.org/winds_ee_tmp.html /hsphere/local/home/saberg/dlarah.org/winds_ee.html
 

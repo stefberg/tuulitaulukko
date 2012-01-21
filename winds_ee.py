@@ -9,7 +9,7 @@ import sys
 
 url = 'http://www.emhi.ee/ilma_andmed/xml/observations.php'
 infoUrl = 'http://www.emhi.ee/index.php?ide=15&v_kiht=1'
-codes = ["86093", "86094", "26122", "26115", "26218", "26231"]
+codes = ["86093", "86094", "26115", "26218", "26231"]
 stationsTable = {}
 
 def getUrl(url):
