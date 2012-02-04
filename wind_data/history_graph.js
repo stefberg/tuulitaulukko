@@ -12,6 +12,7 @@ var bottomMargin = 20;
 var rightMargin = 0;
 var topMargin = 4;
 var dataMaxY = 20;
+var dataMinY = 0;
 var dataMaxX = 100;
 var dataMinX = 0;
 var fetchYear;
@@ -193,7 +194,7 @@ function drawBackground()
       if (ss > dataMaxX) {
 	ss = dataMaxX;
       }
-      fillRect(ss, 0, sr-ss, dataMaxY);
+      fillRect(ss, dataMinY, sr-ss, dataMaxY-dataMinY);
     }
     ss = sr + 1;
   } while (sr < dataMaxX);
@@ -206,12 +207,12 @@ function drawLabels()
     context.strokeStyle = 'rgb(220, 220, 220)';
     var grid1 = 2;
     var grid2 = 6;
-    if (dataMaxY > 200) {
+    if (dataMaxY - dataMinY> 200) {
       grid1 = 45;
       grid2 = 90;
     }
     var y;
-    for (y = 0; y < dataMaxY; y += grid1) {
+    for (y = dataMinY; y < dataMaxY; y += grid1) {
         var p1 = $V([0, y, 1]);
         p1 = viewMatrix.multiply(p1);
         context.fillText(y + "", 2, p1.e(2));
@@ -221,7 +222,7 @@ function drawLabels()
     }
     context.beginPath();
     context.strokeStyle = '#000000';
-    for (y = 0; y < dataMaxY; y += grid2) {
+    for (y = dataMinY; y < dataMaxY; y += grid2) {
         var p1 = $V([0, y, 1]);
         p1 = viewMatrix.multiply(p1);
         context.fillText(y + "", 2, p1.e(2));
@@ -229,7 +230,7 @@ function drawLabels()
         lineTo(dataMaxX, y);
         stroke();
     }
-    var p1 = $V([0, dataMaxY, 1]);
+    var p1 = $V([0, dataMaxY-dataMinY, 1]);
     p1 = viewMatrix.multiply(p1);
     context.fillText(dataMaxY + "", 2, p1.e(2));
 
@@ -243,7 +244,7 @@ function drawLabels()
         var hour3 = round(min/60/3, 0);
         var p1 = $V([hour3*60*3, 0, 1]);
         p1 = viewMatrix.multiply(p1);
-        moveTo(hour3*3*60, 0);
+        moveTo(hour3*3*60, dataMinY);
         lineTo(hour3*3*60, dataMaxY);
         stroke();
         while (hour3 >= 24/3) {
@@ -332,14 +333,17 @@ function calcRange()
     var i;
     dataMaxX = 0;
     dataMinX = 1000000;
-    dataMaxY = 0;
-
+    dataMaxY = -1000000;
+    dataMinY = 1000000;
     for (i = 0; i < data.length; i++) {
       var d;
       for (d = 0; d < drawSet.length; d++) {
         var yVal = data[i][drawSet[d]];
         if (yVal > dataMaxY) {
           dataMaxY = yVal;
+        }      
+        if (yVal < dataMinY) {
+          dataMinY = yVal;
         }      
       }
       if (data[i][DF_MINUTE] > dataMaxX) {
@@ -349,16 +353,23 @@ function calcRange()
         dataMinX = data[i][DF_MINUTE];
       }
     }
+    if (dataMinY > 0) {
+      dataMinY = 0;
+    } else {
+      dataMinY = Math.floor(dataMinY-2)
+    }
+    if (dataMaxY < 0) dataMaxY = 0;
     if (lastFetchedDay < fetchEndDay) {
         var date = new Date();
         dataMaxX = dataMinX + (fetchEndDay - fetchStartDay)*60*24 + date.getHours()*60 + date.getMinutes();
     }
     if (drawSet == drawSetWindDir) {
       dataMaxY = 360;
+      dataMinY = 0;
     }
     dataMatrix = scaleMatrix(drawAreaWidth / (dataMaxX - dataMinX),
-                             drawAreaHeight/ dataMaxY);
-    dataMatrix = dataMatrix.multiply(translateMatrix(-dataMinX, 0));
+                             drawAreaHeight/ (dataMaxY - dataMinY));
+    dataMatrix = dataMatrix.multiply(translateMatrix(-dataMinX, -dataMinY));
 
     viewMatrix = windowMatrix.multiply(dataMatrix);
 }
