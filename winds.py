@@ -35,7 +35,7 @@ stations = [ ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=l
              ("ilml", "Russarö", "station=2982&place=Hanko"),
              ("ilml", "Isokari", "station=2964&place=Kustavi"),
              ("ilml", "Rauma", "station=2761&place=Rauma"),
-             ("yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
+#             ("yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
              ("ilml", "Tahkoluoto", "station=2751&place=Pori"),
              ("ilml", "Tankar", "station=2721&place=Kokkola"),
              ("ilml", "Ulkokalla", "station=2907&place=Kalajoki")
