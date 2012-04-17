@@ -3,6 +3,7 @@
 
 import time
 import urllib
+import string
 from HTMLParser import HTMLParser
 import re
 import os
@@ -26,6 +27,7 @@ stations = [ ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=l
              ("ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
              ("ilml", "Harmaja", "station=2795&place=Helsinki"),
              ("ilml", "Hel.Majakka", "station=2989&place=Helsinki"),
+             ("saapalvelu", "koivusaari", "/helsinki/index.php"),
              ("bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
              ("bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("ilml", "Bågaskär", "station=2984&place=Inkoo"),
@@ -40,10 +42,14 @@ stations = [ ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=l
              ("ilml", "Tankar", "station=2721&place=Kokkola"),
              ("ilml", "Ulkokalla", "station=2907&place=Kalajoki")
              ]
+
+XXstations = [ ("saapalvelu", "Koivusaari", "/helsinki/index.php")
+             ]
 ilmlurl = "http://ilmatieteenlaitos.fi/suomen-havainnot?p_p_id=stationstatusportlet_WAR_fmiwwwweatherportlets&p_r_p_1689542720_parameter=21&"
 fmiurl = "http://legacy.fmi.fi/saa/paikalli.html?param=21&"
 remlog = "http://www.remlog.com/cgi/tplast.pl?node="
 yyteriUrl="http://surfkeskus.dyndns.org/saa/"
+saapalveluUrl="http://www.saapalvelu.fi"
 
 def getUrl(url):
     f = urllib.urlopen(url)
@@ -304,6 +310,92 @@ class YyteriParser(HTMLParser):
     def handle_data(self, data):
         self.text = self.text + " " + data
 
+def onlyAscii(a):
+    b=''
+    for i in range(0, len(a)):
+        if string.printable.find(a[i]) >= 0:
+            b = b+a[i]
+    return b
+
+class SaapalveluParser(HTMLParser):
+    
+    def __init__(self, info_url):
+        HTMLParser.__init__(self)
+        self.table = []
+        self.time = 0
+        self.wind_dir = 0
+        self.wind_speed = 0
+        self.wind_low = 0
+        self.wind_max = 0
+        self.temp = 'na'
+        self.info_url = info_url
+        self.found = False
+        self.intable = False;
+        self.intd = False;
+        self.intemp = False
+        self.inwind = False
+        self.inspan = False
+        self.row = -1
+        self.column = -1
+        self.text = ""
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "table":
+            self.intable = True
+            self.text = ""
+        if tag == "tr" and self.intable:
+            self.row += 1
+            self.column = -1
+        if tag == "td" and self.intable:
+            self.intd = True
+            self.text = ""
+        if tag == "span":
+            self.inspan = True
+            self.text = ""
+            
+    def handle_endtag(self, tag):
+        if tag == "table":
+            self.intable = False
+            self.intemp = False
+            self.inwind = False
+            self.text = ""
+        if tag == "td":
+            self.intd = False
+            self.text = ""
+        if tag == "span":
+            self.inspan = False
+            self.text = ""
+
+    def handle_data(self, data):
+        self.text = self.text + " " + data
+        if self.intable and self.intd:
+            if self.text.startswith(" Lmptila"):
+                self.intemp = True
+            if self.text.startswith(" Tuuli"):
+                self.intuuli = True
+            if self.text.startswith(" Tuulen nopeus") and self.intuuli:
+                self.found = True
+                reg = re.search('([0-9]+\.[0-9]+) m/s', self.text)
+                if reg:
+                    self.wind_speed = reg.group(1)
+            if self.text.startswith(" Puuskatuuli") and self.intuuli:
+                reg = re.search('([0-9]+\.[0-9]+) m/s', self.text)
+                if reg:
+                    self.wind_max = reg.group(1)
+            if self.text.startswith(" Tuulen suunta") and self.intuuli:
+                reg = re.search(' ([0-9]+)', self.text)
+                if reg:
+                    self.wind_dir = reg.group(1)
+            if self.text.startswith(" T ll  hetkell") and self.intemp:
+                reg = re.search(' ([0-9]+\.[0-9])', self.text)
+                if reg:
+                    self.temp = reg.group(1)
+        if self.text.startswith(" P ivittynyt viimeksi:") and self.inspan:
+            reg = re.search(' ([0-9]+:[0-9]+)', self.text)
+            if reg:
+                self.time = reg.group(1)
+                
+
 #page = getUrl(yyteriUrl)
 #parser = YyteriParser("")
 #parser.feed(page)
@@ -384,6 +476,14 @@ for v in stations:
             parser.feed(page)
             if parser.found:
                 list.append([v[1], parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max, parser.temp, parser.info_url])
+        elif type == "saapalvelu":
+            page = getUrl(saapalveluUrl+v[2])
+            parser = SaapalveluParser(saapalveluUrl+v[2])
+            page = page.replace('sc\'+\'ript', 'script', 2)
+            parser.feed(onlyAscii(page))
+            if parser.found:
+                list.append([v[1], parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max, parser.temp, parser.info_url])
+
     except IOError:
         print "IOError on ", v[1]
 

@@ -84,7 +84,7 @@ function parseData(yday, dataStr)
   var l;
   for (l = 0; l < sa.length; l++) {
     var fields = sa[l].split(",");
-    if (fields.length > 5) {
+    if (fields.length > 5 && fields[5].indexOf(":") > 0) {
       var time = fields[5].split(":");
       var checkHour = parseInt(fields[3]);
       var hour = parseInt(trimLeading0(time[0]));
@@ -106,8 +106,8 @@ function parseData(yday, dataStr)
       var windMax = parseFloat(nona(fields[9]));
       var temp = parseFloat(nona(fields[10]));
       var minuteFromStart = (yday - fetchStartDay)*24*60 + hour*60+minute;
-          //	    debug(l + " T: " + checkHour + " " + time[0] + " " + time[1] + " " + fields[5] + " " + hour+":"+minute);
-          //	    debug(l + " M: " + minuteFromStart + " W: " + wind);
+      //      debug(l + " T: " + checkHour + " " + time[0] + " " + time[1] + " " + fields[5] + " " + hour+":"+minute);
+      //      debug(l + " M: " + minuteFromStart + " W: " + wind);
       var d = new Array();
       d.push(yday);
       d.push(minuteFromStart);
