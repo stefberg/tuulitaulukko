@@ -20,27 +20,27 @@ stations = [ ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=l
              ("remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
              ("remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti"),
 #             ("remlog", "kalliosaari", "http://www.remlog.com/cgi/tplog.pl?node=kalliosaari"),
-             ("ilml", "Rankki", "station=2976&place=Kotka"), 
-             ("ilml", "Emäsalo", "station=2991&place=Porvoo"), 
-             ("ilml", "Kalbådagrund", "station=2987&place=Porvoo"),
+#             ("ilml", "Rankki", "station=2976&place=Kotka"), 
+#             ("ilml", "Emäsalo", "station=2991&place=Porvoo"), 
+#             ("ilml", "Kalbådagrund", "station=2987&place=Porvoo"),
              ("ilml", "Eestiluoto", "station=2930&place=Helsinki"),
-             ("ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
+#             ("ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
              ("ilml", "Harmaja", "station=2795&place=Helsinki"),
-             ("ilml", "Hel.Majakka", "station=2989&place=Helsinki"),
+#             ("ilml", "Hel.Majakka", "station=2989&place=Helsinki"),
              ("saapalvelu", "koivusaari", "/helsinki/index.php"),
              ("bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
              ("bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
-             ("ilml", "Bågaskär", "station=2984&place=Inkoo"),
+#             ("ilml", "Bågaskär", "station=2984&place=Inkoo"),
              ("ilml", "Jussarö", "station=2757&place=Raasepori"),
              ("remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
-             ("ilml", "Tulliniemi", "station=2746&place=Hanko"),
-             ("ilml", "Russarö", "station=2982&place=Hanko"),
-             ("ilml", "Isokari", "station=2964&place=Kustavi"),
-             ("ilml", "Rauma", "station=2761&place=Rauma"),
+             ("ilml", "Tulliniemi", "station=2746&place=Hanko")
+#             ("ilml", "Russarö", "station=2982&place=Hanko"),
+#             ("ilml", "Isokari", "station=2964&place=Kustavi"),
+#             ("ilml", "Rauma", "station=2761&place=Rauma"),
 #             ("yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
-             ("ilml", "Tahkoluoto", "station=2751&place=Pori"),
-             ("ilml", "Tankar", "station=2721&place=Kokkola"),
-             ("ilml", "Ulkokalla", "station=2907&place=Kalajoki")
+#             ("ilml", "Tahkoluoto", "station=2751&place=Pori"),
+#             ("ilml", "Tankar", "station=2721&place=Kokkola"),
+#             ("ilml", "Ulkokalla", "station=2907&place=Kalajoki")
              ]
 
 XXstations = [ ("saapalvelu", "Koivusaari", "/helsinki/index.php")
@@ -494,7 +494,7 @@ print '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"'
 print '  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
 print '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">'
 print '  <head>'
-print '    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>'
+print '    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>'
 print '    <title>Tuulet</title>'
 print '    <style type="text/css">'
 print '    v\:* {'
@@ -590,12 +590,15 @@ print '    </td>'
 print '  </tr>'
 print '    </table>'
 
-print '<a href="http://dlarah.org/forecasts.html">Ennusteet</a><br/>'
-print '<a href="http://dlarah.org/winds_ee.html">Eesti asemat</a>'
+print '<a href="forecasts.html">Ennusteet</a><br/>'
+print '<a href="winds_ee.html">Eesti asemat</a>'
 print '<br/><br/>'
 print ' </html>'
 #dir = 'ttt/'
-dir = '/hsphere/local/home/saberg/dlarah.org/wind_data/'
+if os.uname()[1] == 'kopsu.com':
+    dir = '/home/webadmin/kopsu.com/html/wind_data/'
+else:
+    dir = '/hsphere/local/home/saberg/dlarah.org/wind_data/'
 stationsFile = 'stations.txt'
 
 sf = open(dir + stationsFile, "w")

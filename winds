@@ -2,11 +2,20 @@
 
 export TZ="Europe/Helsinki"
 
-/hsphere/local/home/saberg/dlarah.org/cgi-bin/winds.py > /hsphere/local/home/saberg/dlarah.org/winds_tmp.html
+if [ `hostname` = "kopsu.com" ]
+then
+    cgi_dir=/home/webadmin/kopsu.com/cgi-bin
+    html_dir=/home/webadmin/kopsu.com/html
+else
+    cgi_dir=/hsphere/local/home/saberg/dlarah.org/cgi-bin
+    html_dir=/hsphere/local/home/saberg/dlarah.org
+fi
 
-[ $? -eq 0 ] && cp /hsphere/local/home/saberg/dlarah.org/winds_tmp.html /hsphere/local/home/saberg/dlarah.org/winds.html
+$cgi_dir/winds.py > $html_dir/winds_tmp.html
 
-/hsphere/local/home/saberg/dlarah.org/cgi-bin/winds_ee.py > /hsphere/local/home/saberg/dlarah.org/winds_ee_tmp.html
+[ $? -eq 0 ] && cp $html_dir/winds_tmp.html $html_dir/winds.html
 
-[ $? -eq 0 ] && cp /hsphere/local/home/saberg/dlarah.org/winds_ee_tmp.html /hsphere/local/home/saberg/dlarah.org/winds_ee.html
+$cgi_dir/winds_ee.py > $html_dir/winds_ee_tmp.html
+
+[ $? -eq 0 ] && cp $html_dir/winds_ee_tmp.html $html_dir/winds_ee.html
 
