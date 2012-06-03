@@ -33,12 +33,12 @@ stations = [ ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=l
 #             ("ilml", "Bågaskär", "station=2984&place=Inkoo"),
              ("ilml", "Jussarö", "station=2757&place=Raasepori"),
              ("remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
-             ("ilml", "Tulliniemi", "station=2746&place=Hanko")
+             ("ilml", "Tulliniemi", "station=2746&place=Hanko"),
 #             ("ilml", "Russarö", "station=2982&place=Hanko"),
 #             ("ilml", "Isokari", "station=2964&place=Kustavi"),
 #             ("ilml", "Rauma", "station=2761&place=Rauma"),
 #             ("yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
-#             ("ilml", "Tahkoluoto", "station=2751&place=Pori"),
+             ("ilml", "Tahkoluoto", "station=2751&place=Pori")
 #             ("ilml", "Tankar", "station=2721&place=Kokkola"),
 #             ("ilml", "Ulkokalla", "station=2907&place=Kalajoki")
              ]
@@ -494,7 +494,7 @@ print '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"'
 print '  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
 print '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">'
 print '  <head>'
-print '    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>'
+print '    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>'
 print '    <title>Tuulet</title>'
 print '    <style type="text/css">'
 print '    v\:* {'

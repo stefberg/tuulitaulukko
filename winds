@@ -13,9 +13,9 @@ fi
 
 $cgi_dir/winds.py > $html_dir/winds_tmp.html
 
-[ $? -eq 0 ] && cp $html_dir/winds_tmp.html $html_dir/winds.html
+[ $? -eq 0 ] && iconv -f utf-8 -t iso-8859-1 < $html_dir/winds_tmp.html > $html_dir/winds.html
 
 $cgi_dir/winds_ee.py > $html_dir/winds_ee_tmp.html
 
-[ $? -eq 0 ] && cp $html_dir/winds_ee_tmp.html $html_dir/winds_ee.html
+[ $? -eq 0 ] && iconv -f utf-8 -t iso-8859-1 < $html_dir/winds_ee_tmp.html > $html_dir/winds_ee.html
 
