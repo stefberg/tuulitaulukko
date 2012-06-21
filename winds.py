@@ -30,7 +30,7 @@ stations = [ ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=l
              ("saapalvelu", "koivusaari", "/helsinki/index.php"),
              ("bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
              ("bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
-#             ("ilml", "Bågaskär", "station=2984&place=Inkoo"),
+             ("ilml", "Bågaskär", "station=2984&place=Inkoo"),
              ("ilml", "Jussarö", "station=2757&place=Raasepori"),
              ("remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
              ("ilml", "Tulliniemi", "station=2746&place=Hanko"),
