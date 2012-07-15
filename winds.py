@@ -479,7 +479,7 @@ for v in stations:
         elif type == "saapalvelu":
             page = getUrl(saapalveluUrl+v[2])
             parser = SaapalveluParser(saapalveluUrl+v[2])
-            page = page.replace('sc\'+\'ript', 'script', 2)
+            page = page.replace('sc\'+\'ript', 'script')
             parser.feed(onlyAscii(page))
             if parser.found:
                 list.append([v[1], parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max, parser.temp, parser.info_url])
