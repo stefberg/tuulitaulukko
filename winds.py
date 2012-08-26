@@ -591,6 +591,8 @@ print '  </tr>'
 print '    </table>'
 
 print '<a href="forecasts.html">Ennusteet</a><br/>'
+print '<a href="http://testbed.fmi.fi/history_browser.php?imgtype=wind&t=15&n=1">Testbed</a><br/>'
+
 print '<a href="winds_ee.html">Eesti asemat</a>'
 print '<br/><br/>'
 print ' </html>'
