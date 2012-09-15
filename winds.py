@@ -373,17 +373,17 @@ class SaapalveluParser(HTMLParser):
                 self.intemp = True
             if self.text.startswith(" Tuuli"):
                 self.intuuli = True
-            if self.text.startswith(" Tuulen nopeus") and self.intuuli:
+            if self.text.startswith(" Keskituuli t") and self.intuuli:
                 self.found = True
                 reg = re.search('([0-9]+\.[0-9]+) m/s', self.text)
                 if reg:
                     self.wind_speed = reg.group(1)
-            if self.text.startswith(" Puuskatuuli") and self.intuuli:
+            if self.text.startswith(" Tuulen nopeus") and self.intuuli:
                 reg = re.search('([0-9]+\.[0-9]+) m/s', self.text)
                 if reg:
                     self.wind_max = reg.group(1)
             if self.text.startswith(" Tuulen suunta") and self.intuuli:
-                reg = re.search(' ([0-9]+)', self.text)
+                reg = re.search('10min.* \(([0-9]+)', self.text)
                 if reg:
                     self.wind_dir = reg.group(1)
             if self.text.startswith(" T ll  hetkell") and self.intemp:
