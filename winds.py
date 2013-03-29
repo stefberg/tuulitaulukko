@@ -61,11 +61,14 @@ else:
 #             ("ilml", "Rankki", "station=2976&place=Kotka"), 
 #             ("ilml", "Emäsalo", "station=2991&place=Porvoo"), 
 #             ("ilml", "Kalbådagrund", "station=2987&place=Porvoo"),
+             ("fmibeta", "Emäsalo", "101023"),
+             ("fmibeta", "Kalbådagrund", "101022"),
              ("fmibeta", "Eestiluoto", "101029"),
 #             ("ilml", "Eestiluoto", "station=2930&place=Helsinki"),
 #             ("ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
              ("fmibeta", "Harmaja", "100996"),
 #             ("ilml", "Harmaja", "station=2795&place=Helsinki"),
+             ("fmibeta", "Hel.Majakka", "101003"),
 #             ("ilml", "Hel.Majakka", "station=2989&place=Helsinki"),
              ("saapalvelu", "koivusaari", "/helsinki/index.php"),
              ("bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
@@ -77,13 +80,16 @@ else:
 #             ("remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
              ("fmibeta", "Tulliniemi", "100946"),
 #             ("ilml", "Tulliniemi", "station=2746&place=Hanko"),
+             ("fmibeta", "Russarö", "100932"),
 #             ("ilml", "Russarö", "station=2982&place=Hanko"),
 #             ("ilml", "Isokari", "station=2964&place=Kustavi"),
 #             ("ilml", "Rauma", "station=2761&place=Rauma"),
 #             ("yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
              ("fmibeta", "Tahkoluoto", "101267"),
 #             ("ilml", "Tahkoluoto", "station=2751&place=Pori")
+             ("fmibeta", "Tankar", "101661"),
 #             ("ilml", "Tankar", "station=2721&place=Kokkola"),
+             ("fmibeta", "Ulkokalla", "101673"),
 #             ("ilml", "Ulkokalla", "station=2907&place=Kalajoki")
              ]
 
