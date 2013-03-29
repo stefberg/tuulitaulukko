@@ -8,6 +8,7 @@ from HTMLParser import HTMLParser
 import re
 import os
 import sys
+import fetch_data_lib
 
 tm = time.time()
 time=time.localtime(tm)
@@ -16,29 +17,72 @@ minute=time.tm_min
 
 entityChars = {"auml" : "ä", "ouml" : "ö", "aring" : "å", "nbsp" : " ", "Auml" : "Ä", "Ouml" : "Ö", "Aring" : "å"}
 
-stations = [ ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
-             ("remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
-             ("remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti"),
+if os.uname()[1] == 'kopsu.com':
+    stations = [ 
+#             ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
+#             ("remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
+#             ("remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti"),
 #             ("remlog", "kalliosaari", "http://www.remlog.com/cgi/tplog.pl?node=kalliosaari"),
 #             ("ilml", "Rankki", "station=2976&place=Kotka"), 
 #             ("ilml", "Emäsalo", "station=2991&place=Porvoo"), 
 #             ("ilml", "Kalbådagrund", "station=2987&place=Porvoo"),
+#             ("fmibeta", "Eestiluoto", "101029"),
              ("ilml", "Eestiluoto", "station=2930&place=Helsinki"),
 #             ("ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
+#             ("fmibeta", "Harmaja", "100996"),
              ("ilml", "Harmaja", "station=2795&place=Helsinki"),
 #             ("ilml", "Hel.Majakka", "station=2989&place=Helsinki"),
              ("saapalvelu", "koivusaari", "/helsinki/index.php"),
              ("bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
              ("bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
+#             ("fmibeta", "Bågaskär", "100969"),
              ("ilml", "Bågaskär", "station=2984&place=Inkoo"),
+#             ("fmibeta", "Jussarö", "100965"),
              ("ilml", "Jussarö", "station=2757&place=Raasepori"),
-             ("remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
+#             ("remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
+#             ("fmibeta", "Tulliniemi", "100946"),
              ("ilml", "Tulliniemi", "station=2746&place=Hanko"),
 #             ("ilml", "Russarö", "station=2982&place=Hanko"),
 #             ("ilml", "Isokari", "station=2964&place=Kustavi"),
 #             ("ilml", "Rauma", "station=2761&place=Rauma"),
 #             ("yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
+#             ("fmibeta", "Tahkoluoto", "101267"),
              ("ilml", "Tahkoluoto", "station=2751&place=Pori")
+#             ("ilml", "Tankar", "station=2721&place=Kokkola"),
+#             ("ilml", "Ulkokalla", "station=2907&place=Kalajoki")
+             ]
+
+else:
+    stations = [ 
+#             ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
+#             ("remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
+#             ("remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti"),
+#             ("remlog", "kalliosaari", "http://www.remlog.com/cgi/tplog.pl?node=kalliosaari"),
+#             ("ilml", "Rankki", "station=2976&place=Kotka"), 
+#             ("ilml", "Emäsalo", "station=2991&place=Porvoo"), 
+#             ("ilml", "Kalbådagrund", "station=2987&place=Porvoo"),
+             ("fmibeta", "Eestiluoto", "101029"),
+#             ("ilml", "Eestiluoto", "station=2930&place=Helsinki"),
+#             ("ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
+             ("fmibeta", "Harmaja", "100996"),
+#             ("ilml", "Harmaja", "station=2795&place=Helsinki"),
+#             ("ilml", "Hel.Majakka", "station=2989&place=Helsinki"),
+             ("saapalvelu", "koivusaari", "/helsinki/index.php"),
+             ("bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
+             ("bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
+             ("fmibeta", "Bågaskär", "100969"),
+#             ("ilml", "Bågaskär", "station=2984&place=Inkoo"),
+             ("fmibeta", "Jussarö", "100965"),
+#             ("ilml", "Jussarö", "station=2757&place=Raasepori"),
+#             ("remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
+             ("fmibeta", "Tulliniemi", "100946"),
+#             ("ilml", "Tulliniemi", "station=2746&place=Hanko"),
+#             ("ilml", "Russarö", "station=2982&place=Hanko"),
+#             ("ilml", "Isokari", "station=2964&place=Kustavi"),
+#             ("ilml", "Rauma", "station=2761&place=Rauma"),
+#             ("yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
+             ("fmibeta", "Tahkoluoto", "101267"),
+#             ("ilml", "Tahkoluoto", "station=2751&place=Pori")
 #             ("ilml", "Tankar", "station=2721&place=Kokkola"),
 #             ("ilml", "Ulkokalla", "station=2907&place=Kalajoki")
              ]
@@ -465,6 +509,13 @@ for v in stations:
             parser.close()
             if parser.found:
                 list.append([v[1], parser.parameterValues["time"], parser.parameterValues["wind_dir"], 0, parser.parameterValues["wind_speed"], parser.parameterValues["Puuska"], parser.parameterValues["Lämpötila"], parser.info_url])
+        elif type == "fmibeta":
+            observations = fetch_data_lib.fetchData(v[2], 0, 'winddirection,windspeedms,windgust,temperature')
+            if len(observations) > 0:
+                last = len(observations[0]) - 1
+                tm = observations[0][last-1].split(',')
+                info_url = ilmlurl + 'station=' + v[2]
+                list.append([v[1], tm[len(tm)-1], observations[0][last], 0, observations[1][last], observations[2][last], observations[3][last], info_url])
         elif type == "bw":
             parser = bwParser(v[3])
             parser.parse(v[2])

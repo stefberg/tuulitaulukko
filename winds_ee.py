@@ -38,11 +38,12 @@ minute=time[4]
 stations = observations[0].getElementsByTagName("station")
 
 for station in stations:
-    wmocode = station.getElementsByTagName("wmocode")[0].childNodes[0].data
-    if wmocode in stationsTable:
-        stationsTable[wmocode].append(station)
-    else:
-        stationsTable[wmocode] = [ station ]
+    if len(station.getElementsByTagName("wmocode")) > 0 and len(station.getElementsByTagName("wmocode")[0].childNodes):
+        wmocode = station.getElementsByTagName("wmocode")[0].childNodes[0].data
+        if wmocode in stationsTable:
+            stationsTable[wmocode].append(station)
+        else:
+            stationsTable[wmocode] = [ station ]
 
 def getText(node):
     allText = ''
