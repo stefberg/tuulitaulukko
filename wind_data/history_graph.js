@@ -381,18 +381,22 @@ function drawData()
     var d;
     for (d = 0; d < drawSet.length; d++) {
       context.beginPath();
+      var prevXVal = -1;
       for (i = 0; i < data.length; i++) {
         yVal = data[i][drawSet[d]];
-        if (i == 0) {
-          moveTo(data[i][DF_MINUTE], yVal);
-        } else {
-              //	  if (Math.abs(yVal - prevyVal) > 200) {
-              //	    moveTo(data[i][DF_MINUTE], yVal);
-              //	  } else {
-          lineTo(data[i][DF_MINUTE], yVal);
-              //	  }
-        }
-        prevyVal = yVal;
+          if (data[i][DF_MINUTE] > prevXVal) {
+              if (i == 0) {
+		  moveTo(data[i][DF_MINUTE], yVal);
+              } else {
+		  //	  if (Math.abs(yVal - prevyVal) > 200) {
+		  //	    moveTo(data[i][DF_MINUTE], yVal);
+		  //	  } else {
+		  lineTo(data[i][DF_MINUTE], yVal);
+		  //	  }
+              }
+              prevyVal = yVal;
+	      prevXVal = data[i][DF_MINUTE];
+	  }
       }
       context.strokeStyle = lineColors[d];
       stroke();
