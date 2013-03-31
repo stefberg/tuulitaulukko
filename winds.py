@@ -61,42 +61,45 @@ else:
 #             ("ilml", "Rankki", "station=2976&place=Kotka"), 
 #             ("ilml", "Emäsalo", "station=2991&place=Porvoo"), 
 #             ("ilml", "Kalbådagrund", "station=2987&place=Porvoo"),
-             ("fmibeta", "Emäsalo", "101023"),
-             ("fmibeta", "Kalbådagrund", "101022"),
-             ("fmibeta", "Eestiluoto", "101029"),
+             ("FmiBeta", "Emäsalo", "101023"),
+             ("FmiBeta", "Kalbådagrund", "101022"),
+             ("FmiBeta", "Eestiluoto", "101029"),
 #             ("ilml", "Eestiluoto", "station=2930&place=Helsinki"),
 #             ("ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
-             ("fmibeta", "Harmaja", "100996"),
+             ("FmiBeta", "Harmaja", "100996"),
 #             ("ilml", "Harmaja", "station=2795&place=Helsinki"),
-             ("fmibeta", "Hel.Majakka", "101003"),
+             ("FmiBeta", "Hel.Majakka", "101003"),
 #             ("ilml", "Hel.Majakka", "station=2989&place=Helsinki"),
-             ("saapalvelu", "koivusaari", "/helsinki/index.php"),
-             ("bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
-             ("bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
-             ("fmibeta", "Bågaskär", "100969"),
+             ("Saapalvelu", "koivusaari", "/helsinki/index.php"),
+             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
+             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
+             ("FmiBeta", "Bågaskär", "100969"),
 #             ("ilml", "Bågaskär", "station=2984&place=Inkoo"),
-             ("fmibeta", "Jussarö", "100965"),
+             ("FmiBeta", "Jussarö", "100965"),
 #             ("ilml", "Jussarö", "station=2757&place=Raasepori"),
 #             ("remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
-             ("fmibeta", "Tulliniemi", "100946"),
+             ("FmiBeta", "Tulliniemi", "100946"),
 #             ("ilml", "Tulliniemi", "station=2746&place=Hanko"),
-             ("fmibeta", "Russarö", "100932"),
+             ("FmiBeta", "Russarö", "100932"),
 #             ("ilml", "Russarö", "station=2982&place=Hanko"),
 #             ("ilml", "Isokari", "station=2964&place=Kustavi"),
 #             ("ilml", "Rauma", "station=2761&place=Rauma"),
 #             ("yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
-             ("fmibeta", "Tahkoluoto", "101267"),
+             ("FmiBeta", "Tahkoluoto", "101267"),
 #             ("ilml", "Tahkoluoto", "station=2751&place=Pori")
-             ("fmibeta", "Tankar", "101661"),
+             ("FmiBeta", "Tankar", "101661"),
 #             ("ilml", "Tankar", "station=2721&place=Kokkola"),
-             ("fmibeta", "Ulkokalla", "101673"),
+             ("FmiBeta", "Ulkokalla", "101673"),
 #             ("ilml", "Ulkokalla", "station=2907&place=Kalajoki")
              ]
 
-XXstations = [ ("saapalvelu", "Koivusaari", "/helsinki/index.php")
-             ]
+#stations = [ ("Ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
+#             ("Saapalvelu", "koivusaari", "/helsinki/index.php"),
+#             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
+#             ("FmiBeta", "Harmaja", "100996"),
+#             ("FmiBeta", "Tulliniemi", "100946"),
+#             ]
 ilmlurl = "http://ilmatieteenlaitos.fi/suomen-havainnot?p_p_id=stationstatusportlet_WAR_fmiwwwweatherportlets&p_r_p_1689542720_parameter=21&"
-fmiurl = "http://legacy.fmi.fi/saa/paikalli.html?param=21&"
 remlog = "http://www.remlog.com/cgi/tplast.pl?node="
 yyteriUrl="http://surfkeskus.dyndns.org/saa/"
 saapalveluUrl="http://www.saapalvelu.fi"
@@ -212,65 +215,6 @@ class ILMLParser(HTMLParser):
     def handle_data(self, data):
         global ind
         if self.inParameterName or self.inParameterValue or self.inTimeStamp:
-            self.text = self.text + data
-
-class FMIParser(HTMLParser):
-    
-    def __init__(self, info_url):
-        HTMLParser.__init__(self)
-        self.havainto = False
-        self.found = False
-        self.time = 'na'
-        self.wind_dir = 'na'
-        self.wind_speed = 'na'
-        self.wind_max = 'na'
-        self.info_url = info_url
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "p":
-            for a in attrs:
-                if a[0] == "class" and a[1] == "observation-text":
-                    self.havainto = True
-                    self.text = ""
-        if tag == "br" and self.havainto:
-            self.text = self.text + ' '
-
-    def handle_endtag(self, tag):
-        if tag == "p" and self.havainto:
-            self.found = True
-            self.havainto = False
-            fields = self.text.split(';')
-            reg = 0
-            if len(fields) > 0:
-                reg = re.search('([0-9]+:[0-9]+)', fields[0])
-            if reg:
-                self.time  = reg.group(1)
-            for f in [ 0, 1, 2, 3, 4, 5 ]:
-                reg = 0
-                if len(fields) > f:
-                    reg = re.search(' ([^ ]*)tuulta ([0-9]*) m/s', fields[f])
-                if reg:
-                    self.wind_dir = reg.group(1)
-                    self.wind_speed = reg.group(2)
-                reg = 0
-                if len(fields) > f:
-                    reg = re.search('(tyyntä)', fields[f])
-                if reg:
-                    self.wind_dir = reg.group(1)
-                    self.wind_speed = 0
-                reg = 0
-                if len(fields) > f:
-                    reg = re.search('puuska ([0-9]*) m/s', fields[f])
-                if reg:
-                    self.wind_max = reg.group(1)
-
-    def handle_entityref(self, char):
-        if self.havainto and char in entityChars:
-            self.text = self.text + entityChars[char]
-
-    def handle_data(self, data):
-        global ind
-        if self.havainto:
             self.text = self.text + data
 
 class RemlogParser(HTMLParser):
@@ -482,6 +426,98 @@ class bwParser:
             self.temp = reg.group(8)
             self.found = True
 
+class DataGather(object):
+    
+    def __init__(self, initData, info_url):
+        self.name = initData[1]
+        self.time = 0
+        self.wind_dir = 0
+        self.wind_low = 0
+        self.wind_speed = 0
+        self.wind_max = 0
+        self.temp = 0
+        self.found = False
+        self.info_url = info_url
+        
+class IlmlGather(DataGather):
+
+    def __init__(self, initData):
+        self.page_url = ilmlurl + initData[2]
+        super(IlmlGather, self).__init__(initData, ilmlurl + initData[2])
+
+    def doGather(self):
+        self.page = getUrl(self.page_url)
+        self.parser = ILMLParser(self.info_url)
+        self.parser.feed(self.page)
+        self.parser.close()
+        if self.parser.found:
+            self.found = True
+            self.time = self.parser.parameterValues["time"]
+            self.wind_dir = self.parser.parameterValues["wind_dir"]
+            self.wind_speed = self.parser.parameterValues["wind_speed"]
+            self.wind_max = self.parser.parameterValues["Puuska"]
+            self.temp = self.parser.parameterValues["Lämpötila"]
+
+class SaapalveluGather(DataGather):
+
+    def __init__(self, initData):
+        self.page_url = saapalveluUrl + initData[2]
+        super(SaapalveluGather, self).__init__(initData, saapalveluUrl + initData[2])
+
+    def doGather(self):
+        self.page = getUrl(self.page_url)
+        self.parser = SaapalveluParser(self.page_url)
+        self.page = self.page.replace('sc\'+\'ript', 'script')
+        self.parser.feed(onlyAscii(self.page))
+        if self.parser.found:
+            self.found = True
+            self.time = self.parser.time
+            self.wind_dir = self.parser.wind_dir
+            self.wind_low = self.parser.wind_low
+            self.wind_speed = self.parser.wind_speed
+            self.wind_max = self.parser.wind_max
+            self.temp = self.parser.temp
+
+class BwGather(DataGather):
+
+    def __init__(self, initData):
+        self.page_url = initData[2]
+        super(BwGather, self).__init__(initData, initData[3])
+
+    def doGather(self):
+        self.parser = bwParser(self.info_url)
+        self.parser.parse(self.page_url)
+        if self.parser.found:
+            self.found = True
+            self.time = self.parser.time
+            self.wind_dir = self.parser.wind_dir
+            self.wind_low = self.parser.wind_low
+            self.wind_speed = self.parser.wind_speed
+            self.wind_max = self.parser.wind_max
+            self.temp = self.parser.temp
+
+class FmiBetaGather(DataGather):
+
+    def __init__(self, initData):
+        self.station = initData[2]
+        super(FmiBetaGather, self).__init__(initData, ilmlurl + 'station=' + initData[2])
+
+    def doGather(self):
+        self.observations = fetch_data_lib.fetchData(self.station, 0, 'winddirection,windspeedms,windgust,temperature')
+        if len(self.observations) > 0:
+            last = len(self.observations[0]) - 1
+            if self.observations[0][last] == "NaN":
+                last = last - 2
+            if last-1 < 0:
+                return
+            self.found = True
+            tm = self.observations[0][last-1].split(',')
+            self.time = tm[len(tm)-1]
+            self.wind_dir = self.observations[0][last]
+            self.wind_speed = self.observations[1][last]
+            self.wind_max = self.observations[2][last]
+            self.temp = self.observations[3][last]
+
 #parser = bwParser()
 #parser.parse("e/lastWeather")
 #print parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max
@@ -501,45 +537,17 @@ for v in stations:
             parser.close()
             if parser.found:
                 list.append([v[1], parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max, parser.temp, parser.info_url])
-        elif type == "fmi":
-            page = getUrl(fmiurl + v[2])
-            parser = FMIParser(fmiurl + v[2])
-            parser.feed(page)
-            parser.close()
-            if parser.found:
-                list.append([v[1], parser.time, parser.wind_dir, 0, parser.wind_speed, parser.wind_max, "", parser.info_url])
-        elif type == "ilml":
-            page = getUrl(ilmlurl + v[2])
-            parser = ILMLParser(ilmlurl + v[2])
-            parser.feed(page)
-            parser.close()
-            if parser.found:
-                list.append([v[1], parser.parameterValues["time"], parser.parameterValues["wind_dir"], 0, parser.parameterValues["wind_speed"], parser.parameterValues["Puuska"], parser.parameterValues["Lämpötila"], parser.info_url])
-        elif type == "fmibeta":
-            observations = fetch_data_lib.fetchData(v[2], 0, 'winddirection,windspeedms,windgust,temperature')
-            if len(observations) > 0:
-                last = len(observations[0]) - 1
-                tm = observations[0][last-1].split(',')
-                info_url = ilmlurl + 'station=' + v[2]
-                list.append([v[1], tm[len(tm)-1], observations[0][last], 0, observations[1][last], observations[2][last], observations[3][last], info_url])
-        elif type == "bw":
-            parser = bwParser(v[3])
-            parser.parse(v[2])
-            if parser.found:
-                list.append([v[1], parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max, parser.temp, parser.info_url])
         elif type == "yyteri":
             page = getUrl(yyteriUrl)
             parser = YyteriParser(v[2])
             parser.feed(page)
             if parser.found:
                 list.append([v[1], parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max, parser.temp, parser.info_url])
-        elif type == "saapalvelu":
-            page = getUrl(saapalveluUrl+v[2])
-            parser = SaapalveluParser(saapalveluUrl+v[2])
-            page = page.replace('sc\'+\'ript', 'script')
-            parser.feed(onlyAscii(page))
-            if parser.found:
-                list.append([v[1], parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max, parser.temp, parser.info_url])
+        else:
+            gatherer = eval(v[0] + "Gather(v)")
+            gatherer.doGather()
+            if gatherer.found:
+                list.append(gatherer)
 
     except IOError:
         print "IOError on ", v[1]
@@ -610,7 +618,7 @@ odd = 1
 
 for l in list:
     print '	<tr class="',
-    if oldTime(str(l[1])):
+    if oldTime(str(l.time)):
         print "oldtime",
     else:
         if odd:
@@ -619,12 +627,12 @@ for l in list:
             print "even",
     print '">'
     odd = 1 - odd
-    print '	  <td align="left"><a href="' + str(l[7]) + '"><b>' + str(l[0]) + '</b></a></td>'
-    print '	  <td>' + str(l[1]) + '</td>'
-    print '	  <td><a href="javascript:showStation(\'' + str(l[0]) + '\', 2)">' + str(l[2]) + '</a></td>'
-    print '	  <td><a href="javascript:showStation(\'' + str(l[0]) + '\', 0)">' + str(l[4]) + '</a></td>'
-    print '	  <td><a href="javascript:showStation(\'' + str(l[0]) + '\', 0)">' + str(l[5]) + '</a></td>'
-    print '	  <td><a href="javascript:showStation(\'' + str(l[0]) + '\', 1)">' + str(l[6]) + '&deg;</a></td>'
+    print '	  <td align="left"><a href="' + l.info_url + '"><b>' + l.name + '</b></a></td>'
+    print '	  <td>' + str(l.time) + '</td>'
+    print '	  <td><a href="javascript:showStation(\'' + l.name + '\', 2)">' + str(l.wind_dir) + '</a></td>'
+    print '	  <td><a href="javascript:showStation(\'' + l.name + '\', 0)">' + str(l.wind_speed) + '</a></td>'
+    print '	  <td><a href="javascript:showStation(\'' + l.name + '\', 0)">' + str(l.wind_max) + '</a></td>'
+    print '	  <td><a href="javascript:showStation(\'' + l.name + '\', 1)">' + str(l.temp) + '&deg;</a></td>'
     print '	</tr>'
 
 print '      </tbody>'
@@ -656,17 +664,20 @@ print ' </html>'
 #dir = 'ttt/'
 if os.uname()[1] == 'kopsu.com':
     dir = '/home/webadmin/kopsu.com/html/wind_data/'
+elif os.uname()[1] == 'Macintosh.local':
+    dir = './wind_data/'
 else:
     dir = '/hsphere/local/home/saberg/dlarah.org/wind_data/'
+
 stationsFile = 'stations.txt'
 
 sf = open(dir + stationsFile, "w")
 sf.write(str(time.tm_year) + "," + str(time.tm_yday))
 sf.write("\n")
 for l in list:
-    sf.write(l[0])
+    sf.write(l.name)
     sf.write("\n")
-    datafile = dir + l[0] + "_" + str(time.tm_year) + "-" + str(time.tm_yday) + ".txt"
+    datafile = dir + l.name + "_" + str(time.tm_year) + "-" + str(time.tm_yday) + ".txt"
     lastline = []
     if os.path.exists(datafile):
         f = open(datafile, "r+")
@@ -675,8 +686,8 @@ for l in list:
                 lastline = line.split(',')
     else:
         f = open(datafile, "w")
-    if len(lastline) == 0 or lastline[5] != l[1]:
-        f.write(str(time.tm_year) + ',' + str(time.tm_mon) + ',' + str(time.tm_mday) + ',' + str(time.tm_hour) + ',' + str(time.tm_min) + ',' + str(l[1]) + ',' + str(l[2]) + ',' + str(l[3]) + ',' + str(l[4]) + ',' + str(l[5]) + ',' + str(l[6].replace(',','.')))
+    if len(lastline) == 0 or lastline[5] != l.time:
+        f.write(str(time.tm_year) + ',' + str(time.tm_mon) + ',' + str(time.tm_mday) + ',' + str(time.tm_hour) + ',' + str(time.tm_min) + ',' + str(l.time) + ',' + str(l.wind_dir) + ',' + str(l.wind_low) + ',' + str(l.wind_speed) + ',' + str(l.wind_max) + ',' + str(l.temp).replace(',','.'))
         f.write("\n")
     f.close()
 sf.close()
