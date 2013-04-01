@@ -65,7 +65,11 @@ def formatTime(tm):
     day = reg.group(3)
     hour = reg.group(4)
     minute = reg.group(5)
-    d = datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), 0, 0, None) - datetime.timedelta(0, time.timezone)
+    if time.daylight:
+        tzone = time.altzone
+    else:
+        tzone = time.timezone
+    d = datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), 0, 0, None) - datetime.timedelta(0, tzone)
     return d.strftime('%Y,%m,%d,%H,%M,%H:%M')
 
 def fetchData(station, number_of_days, parameter):
