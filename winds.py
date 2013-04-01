@@ -54,43 +54,27 @@ if os.uname()[1] == 'kopsu.com':
 
 else:
     stations = [ 
-#             ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
-#             ("remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
-#             ("remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti"),
-#             ("remlog", "kalliosaari", "http://www.remlog.com/cgi/tplog.pl?node=kalliosaari"),
-#             ("ilml", "Rankki", "station=2976&place=Kotka"), 
-#             ("ilml", "Emäsalo", "station=2991&place=Porvoo"), 
-#             ("ilml", "Kalbådagrund", "station=2987&place=Porvoo"),
+#             ("Remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
+#             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
+#             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti"),
+#             ("Remlog", "kalliosaari", "http://www.remlog.com/cgi/tplog.pl?node=kalliosaari"),
              ("FmiBeta", "Emäsalo", "101023"),
              ("FmiBeta", "Kalbådagrund", "101022"),
-             ("FmiBeta", "Eestiluoto", "101029"),
-#             ("ilml", "Eestiluoto", "station=2930&place=Helsinki"),
-#             ("ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
-             ("FmiBeta", "Harmaja", "100996"),
-#             ("ilml", "Harmaja", "station=2795&place=Helsinki"),
+             ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>6 and self.wind_dir>90 and self.wind_dir<180'),
+             ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>7 and self.wind_dir>180 and self.wind_dir<240'),
              ("FmiBeta", "Hel.Majakka", "101003"),
-#             ("ilml", "Hel.Majakka", "station=2989&place=Helsinki"),
-             ("Saapalvelu", "koivusaari", "/helsinki/index.php"),
-             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
+             ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>5 and self.wind_dir>180 and self.wind_dir<240'),
+             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>5 and self.wind_dir>180 and self.wind_dir<240'),
              ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("FmiBeta", "Bågaskär", "100969"),
-#             ("ilml", "Bågaskär", "station=2984&place=Inkoo"),
              ("FmiBeta", "Jussarö", "100965"),
-#             ("ilml", "Jussarö", "station=2757&place=Raasepori"),
-#             ("remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
-             ("FmiBeta", "Tulliniemi", "100946"),
-#             ("ilml", "Tulliniemi", "station=2746&place=Hanko"),
+#             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
+             ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>8 and self.wind_dir>80 and self.wind_dir<200'),
              ("FmiBeta", "Russarö", "100932"),
-#             ("ilml", "Russarö", "station=2982&place=Hanko"),
-#             ("ilml", "Isokari", "station=2964&place=Kustavi"),
-#             ("ilml", "Rauma", "station=2761&place=Rauma"),
-#             ("yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
+#             ("Yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
              ("FmiBeta", "Tahkoluoto", "101267"),
-#             ("ilml", "Tahkoluoto", "station=2751&place=Pori")
              ("FmiBeta", "Tankar", "101661"),
-#             ("ilml", "Tankar", "station=2721&place=Kokkola"),
              ("FmiBeta", "Ulkokalla", "101673"),
-#             ("ilml", "Ulkokalla", "station=2907&place=Kalajoki")
              ]
 
 #stations = [ ("Ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
@@ -381,7 +365,7 @@ class SaapalveluParser(HTMLParser):
                 if reg:
                     self.wind_dir = reg.group(1)
             if self.text.startswith(" T ll  hetkell") and self.intemp:
-                reg = re.search(' ([0-9]+\.[0-9])', self.text)
+                reg = re.search(' ([\-0-9]+\.[0-9])', self.text)
                 if reg:
                     self.temp = reg.group(1)
         if self.text.startswith(" P ivittynyt viimeksi:") and self.inspan:
@@ -438,7 +422,53 @@ class DataGather(object):
         self.temp = 0
         self.found = False
         self.info_url = info_url
-        
+        if len(initData) > 4:
+            self.keli_ehto = initData[4]
+        else:
+            self.keli_ehto = ''
+
+    def onkoKelia(self):
+        return self.keli_ehto and eval(self.keli_ehto)
+
+class YyteriGather(DataGather):
+
+    def __init__(self, initData):
+        self.page_url = yyteriUrl
+        super(YyteriGather, self).__init__(initData, initData[2])
+
+    def doGather(self):
+        self.page = getUrl(self.page_url)
+        self.parser = YyteriParser(self.info_url)
+        self.parser.feed(self.page)
+        if self.parser.found:
+            self.found = True
+            self.time = self.parser.time
+            self.wind_dir = self.parser.wind_dir
+            self.wind_low = self.parser.wind_low
+            self.wind_speed = self.parser.wind_speed
+            self.wind_max = self.parser.wind_max
+            self.temp = self.parser.temp
+
+class RemlogGather(DataGather):
+
+    def __init__(self, initData):
+        self.page_url = ilmlurl + initData[2]
+        super(RemlogGather, self).__init__(initData, ilmlurl + initData[2])
+
+    def doGather(self):
+        self.page = getUrl(remlog + initData[1])
+        self.parser = RemlogParser(initData[2])
+        self.parser.feed(self.page)
+        self.parser.close()
+        if self.parser.found:
+            self.found = True
+            self.time = self.parser.time
+            self.wind_dir = float(self.parser.wind_dir)
+            self.wind_low = float(self.parser.wind_low)
+            self.wind_speed = float(self.parser.wind_speed)
+            self.wind_max = float(self.parser.wind_max)
+            self.temp = self.parser.temp
+
 class IlmlGather(DataGather):
 
     def __init__(self, initData):
@@ -472,11 +502,11 @@ class SaapalveluGather(DataGather):
         if self.parser.found:
             self.found = True
             self.time = self.parser.time
-            self.wind_dir = self.parser.wind_dir
-            self.wind_low = self.parser.wind_low
-            self.wind_speed = self.parser.wind_speed
-            self.wind_max = self.parser.wind_max
-            self.temp = self.parser.temp
+            self.wind_dir = float(self.parser.wind_dir)
+            self.wind_low = float(self.parser.wind_low)
+            self.wind_speed = float(self.parser.wind_speed)
+            self.wind_max = float(self.parser.wind_max)
+            self.temp = float(self.parser.temp)
 
 class BwGather(DataGather):
 
@@ -490,11 +520,11 @@ class BwGather(DataGather):
         if self.parser.found:
             self.found = True
             self.time = self.parser.time
-            self.wind_dir = self.parser.wind_dir
-            self.wind_low = self.parser.wind_low
-            self.wind_speed = self.parser.wind_speed
-            self.wind_max = self.parser.wind_max
-            self.temp = self.parser.temp
+            self.wind_dir = float(self.parser.wind_dir)
+            self.wind_low = float(self.parser.wind_low)
+            self.wind_speed = float(self.parser.wind_speed)
+            self.wind_max = float(self.parser.wind_max)
+            self.temp = float(self.parser.temp)
 
 class FmiBetaGather(DataGather):
 
@@ -513,10 +543,10 @@ class FmiBetaGather(DataGather):
             self.found = True
             tm = self.observations[0][last-1].split(',')
             self.time = tm[len(tm)-1]
-            self.wind_dir = self.observations[0][last]
-            self.wind_speed = self.observations[1][last]
-            self.wind_max = self.observations[2][last]
-            self.temp = self.observations[3][last]
+            self.wind_dir = float(self.observations[0][last])
+            self.wind_speed = float(self.observations[1][last])
+            self.wind_max = float(self.observations[2][last])
+            self.temp = float(self.observations[3][last])
 
 #parser = bwParser()
 #parser.parse("e/lastWeather")
@@ -529,26 +559,10 @@ list = []
 
 for v in stations:
     try:
-        type = v[0]
-        if type == "remlog":
-            page = getUrl(remlog + v[1])
-            parser = RemlogParser(v[2])
-            parser.feed(page)
-            parser.close()
-            if parser.found:
-                list.append([v[1], parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max, parser.temp, parser.info_url])
-        elif type == "yyteri":
-            page = getUrl(yyteriUrl)
-            parser = YyteriParser(v[2])
-            parser.feed(page)
-            if parser.found:
-                list.append([v[1], parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max, parser.temp, parser.info_url])
-        else:
-            gatherer = eval(v[0] + "Gather(v)")
-            gatherer.doGather()
-            if gatherer.found:
-                list.append(gatherer)
-
+        gatherer = eval(v[0] + "Gather(v)")
+        gatherer.doGather()
+        if gatherer.found:
+            list.append(gatherer)
     except IOError:
         print "IOError on ", v[1]
 
@@ -571,6 +585,7 @@ print 'table.lboardsnip td, table.lboardsnip th { border:1px solid #999;padding:
 print 'table.lboardsnip tr.head th {background-color:#3D3D33;color:#CCCCC2;font-weight:normal;}'
 print 'table.lboardsnip tr.odd {background-color:#CCCCC2;}'
 print 'table.lboardsnip tr.even {background-color:#DCDCD2;}'
+print 'table.lboardsnip tr.kelia {background-color:#D2F1D2;}'
 print 'table.lboardsnip tr.oldtime {color:#909090; background-color:#DCDCD2;}'
 print 'table.lboardsnip tr.foot td {background-color:#AAAAA0;font-weight:normal;padding-left:4px;}'
 print 'table.lboardsnip .lal {padding-left:4px;}'
@@ -621,7 +636,9 @@ for l in list:
     if oldTime(str(l.time)):
         print "oldtime",
     else:
-        if odd:
+        if l.onkoKelia():
+            print "kelia"
+        elif odd:
             print "odd",
         else:
             print "even",
