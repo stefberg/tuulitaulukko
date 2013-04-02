@@ -60,16 +60,16 @@ else:
 #             ("Remlog", "kalliosaari", "http://www.remlog.com/cgi/tplog.pl?node=kalliosaari"),
              ("FmiBeta", "Emäsalo", "101023"),
              ("FmiBeta", "Kalbådagrund", "101022"),
-             ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>6 and self.wind_dir>90 and self.wind_dir<180'),
-             ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>7 and self.wind_dir>180 and self.wind_dir<240'),
+             ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=6 and self.wind_dir>=85 and self.wind_dir<=290'),
+             ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("FmiBeta", "Hel.Majakka", "101003"),
-             ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>5 and self.wind_dir>180 and self.wind_dir<240'),
-             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>5 and self.wind_dir>180 and self.wind_dir<240'),
+             ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>=5 and self.wind_dir>=180 and self.wind_dir<=240'),
+             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>=5 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("FmiBeta", "Bågaskär", "100969"),
              ("FmiBeta", "Jussarö", "100965"),
 #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
-             ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>8 and self.wind_dir>80 and self.wind_dir<200'),
+             ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=80 and self.wind_dir<=200'),
              ("FmiBeta", "Russarö", "100932"),
 #             ("Yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
              ("FmiBeta", "Tahkoluoto", "101267"),
@@ -83,6 +83,31 @@ else:
 #             ("FmiBeta", "Harmaja", "100996"),
 #             ("FmiBeta", "Tulliniemi", "100946"),
 #             ]
+
+spots = [ ('Laru', 
+           ('Harmaja', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
+           ('eira', 'self.wind_max>=6 and self.wind_dir>=180 and self.wind_dir<=240')),
+          ('Kallvik', ('Eestiluoto', 'self.wind_speed>=6 and self.wind_dir>=85 and self.wind_dir<=290')),
+          ('Eira', 
+           ('Harmaja', 'self.wind_speed>=7 and self.wind_dir>=110 and self.wind_dir<=200'),
+           ('eira', 'self.wind_max>=6 and self.wind_dir>=110 and self.wind_dir<=200')),
+          ('Tullari', 
+           ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=86 and self.wind_dir<=200')),
+          ('Silveri', 
+           ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=270 or self.wind_dir<=20')),
+          ('Veda', 
+           ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=110 and self.wind_dir<=260')),
+          ('4TT', 
+           ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=160 and self.wind_dir<=240')),
+          ('Slaktis', 
+           ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=235 and self.wind_dir<=275')),
+          ('Yyteri', 
+           ('Tahkoluoto', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315')),
+          ('Pollari', 
+           ('Tahkoluoto', 'self.wind_speed>=8 and self.wind_dir>=215 and self.wind_dir<=280')),
+
+]
+
 ilmlurl = "http://ilmatieteenlaitos.fi/suomen-havainnot?p_p_id=stationstatusportlet_WAR_fmiwwwweatherportlets&p_r_p_1689542720_parameter=21&"
 remlog = "http://www.remlog.com/cgi/tplast.pl?node="
 yyteriUrl="http://surfkeskus.dyndns.org/saa/"
@@ -95,18 +120,6 @@ def getUrl(url):
     return res
 
 oldLimitMin = 100
-
-def oldTime(tm):
-    hm = tm.split(':')
-    if len(hm) < 2:
-        return False
-    hr = int(hm[0])
-    min = int(hm[1])
-#    print hour, minute, hr, min, oldLimitMin
-    if hour >= hr:
-        return hour * 60 + minute - (hr * 60 + min) > oldLimitMin
-    return 24*60 - hour * 60 + minute + (hr * 60 + min) > oldLimitMin    
-
 
 ind=0
 
@@ -413,7 +426,10 @@ class bwParser:
 class DataGather(object):
     
     def __init__(self, initData, info_url):
-        self.name = initData[1]
+        if initData:
+            self.name = initData[1]
+        else:
+            self.name = ''
         self.time = 0
         self.wind_dir = 0
         self.wind_low = 0
@@ -428,7 +444,17 @@ class DataGather(object):
             self.keli_ehto = ''
 
     def onkoKelia(self):
-        return self.keli_ehto and eval(self.keli_ehto)
+        return self.keli_ehto  and not self.oldTime() and eval(self.keli_ehto)
+
+    def oldTime(self):
+        hm = self.time.split(':')
+        if len(hm) < 2:
+            return False
+        hr = int(hm[0])
+        min = int(hm[1])
+        if hour >= hr:
+            return hour * 60 + minute - (hr * 60 + min) > oldLimitMin
+        return 24*60 - hour * 60 + minute + (hr * 60 + min) > oldLimitMin    
 
 class YyteriGather(DataGather):
 
@@ -536,7 +562,7 @@ class FmiBetaGather(DataGather):
         self.observations = fetch_data_lib.fetchData(self.station, 0, 'winddirection,windspeedms,windgust,temperature')
         if len(self.observations) > 0:
             last = len(self.observations[0]) - 1
-            if self.observations[0][last] == "NaN":
+            if self.observations[0][last].lower() == "nan":
                 last = last - 2
             if last-1 < 0:
                 return
@@ -548,13 +574,27 @@ class FmiBetaGather(DataGather):
             self.wind_max = float(self.observations[2][last])
             self.temp = float(self.observations[3][last])
 
-#parser = bwParser()
-#parser.parse("e/lastWeather")
-#print parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max
-#parser.parse("m/lastWeather")
-#print parser.time, parser.wind_dir, parser.wind_low, parser.wind_speed, parser.wind_max
-#exit()
+def nameToVar(a):
+    return a.replace('å', 'a').replace('ä', 'a').replace('ö', 'o').replace('Å', 'A').replace('Ä', 'A').replace('Ö', 'O').replace('.', '')
 
+nullStation = DataGather('', '')
+
+def onkoSpotillaKelia(spot):
+    first = True
+    ret = False
+    for station in spot:
+        if not first:
+            name = station[0]
+            if not S[name].oldTime() and S[name].found:
+                condition = station[1]
+                condition = condition.replace('self.', 'S["'+name+'"].')
+                ret = eval(condition)
+                if not ret:
+                    return False
+        first = False
+    return ret
+
+S = {} # stations to use when checking wind on spots
 list = []
 
 for v in stations:
@@ -563,6 +603,9 @@ for v in stations:
         gatherer.doGather()
         if gatherer.found:
             list.append(gatherer)
+            S[nameToVar(gatherer.name)] = gatherer
+        else:
+            S[nameToVar(gatherer.name)] = nullStation
     except IOError:
         print "IOError on ", v[1]
 
@@ -580,7 +623,7 @@ print '    v\:* {'
 print '      behavior:url(#default#VML);'
 print '    }'
 print 'body { margin:0;padding:0; color:#3D3D33; font:10px verdana,arial,sans-serif; line-height:1.4; text-align:left; } table {font:10px verdana, arial, sans-serif;border:0;text-align:left;}'
-print 'table.lboardsnip { background-color:#fff;text-align:center;width:140px;font-size:9px;border-collapse:collapse;}'
+print 'table.lboardsnip { background-color:#fff;text-align:center;width:60px;font-size:9px;border-collapse:collapse;}'
 print 'table.lboardsnip td, table.lboardsnip th { border:1px solid #999;padding:3px 1px; vertical-align:middle;}'
 print 'table.lboardsnip tr.head th {background-color:#3D3D33;color:#CCCCC2;font-weight:normal;}'
 print 'table.lboardsnip tr.odd {background-color:#CCCCC2;}'
@@ -633,11 +676,11 @@ odd = 1
 
 for l in list:
     print '	<tr class="',
-    if oldTime(str(l.time)):
+    if l.oldTime():
         print "oldtime",
     else:
         if l.onkoKelia():
-            print "kelia"
+            print "kelia",
         elif odd:
             print "odd",
         else:
@@ -672,10 +715,34 @@ print '    </td>'
 print '  </tr>'
 print '    </table>'
 
-print '<a href="forecasts.html">Ennusteet</a><br/>'
-print '<a href="http://testbed.fmi.fi/history_browser.php?imgtype=wind&t=15&n=1">Testbed</a><br/>'
+print '<br/><a href="forecasts.html">Ennusteet</a><br/><br/>'
+print '<a href="http://testbed.fmi.fi/history_browser.php?imgtype=wind&t=15&n=1">Testbed</a><br/><br/>'
+print '<a href="winds_ee.html">Eesti asemat</a><br/><br/>'
 
-print '<a href="winds_ee.html">Eesti asemat</a>'
+print '<table class="lboardsnip" cellpadding="0" cellspacing="0">'
+print '      <tbody>'
+print '	<tr class="head">'
+print '	  <th colspan="2"'
+print '	      style="padding-left: 4px;" align="left">'
+print '	    <div style="margin-top: 4px;">Spotit</div>'
+print '	  </th>'
+print '	</tr>'
+
+for spot in spots:
+    print '<tr class="',
+    if onkoSpotillaKelia(spot):
+        print "kelia",
+    elif odd:
+        print "odd",
+    else:
+        print "even",
+    print '">'
+    odd = 1 - odd
+    print '  <td align="left"><b>', spot[0], '</b></td>'
+    print '  <td>&nbsp;&nbsp;&nbsp;</td>'
+    print '</tr>'
+print '	</table>'
+
 print '<br/><br/>'
 print ' </html>'
 #dir = 'ttt/'
