@@ -84,28 +84,83 @@ else:
 #             ("FmiBeta", "Tulliniemi", "100946"),
 #             ]
 
-spots = [ ('Laru', 
-           ('Harmaja', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
-           ('eira', 'self.wind_max>=6 and self.wind_dir>=180 and self.wind_dir<=240')),
-          ('Kallvik', ('Eestiluoto', 'self.wind_speed>=6 and self.wind_dir>=85 and self.wind_dir<=290')),
-          ('Eira', 
-           ('Harmaja', 'self.wind_speed>=7 and self.wind_dir>=110 and self.wind_dir<=200'),
-           ('eira', 'self.wind_max>=6 and self.wind_dir>=110 and self.wind_dir<=200')),
-          ('Tullari', 
-           ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=86 and self.wind_dir<=200')),
-          ('Silveri', 
-           ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=270 or self.wind_dir<=20')),
-          ('Veda', 
-           ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=110 and self.wind_dir<=260')),
-          ('4TT', 
-           ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=160 and self.wind_dir<=240')),
-          ('Slaktis', 
-           ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=235 and self.wind_dir<=275')),
-          ('Yyteri', 
-           ('Tahkoluoto', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315')),
-          ('Pollari', 
-           ('Tahkoluoto', 'self.wind_speed>=8 and self.wind_dir>=215 and self.wind_dir<=280')),
-
+spots = [ 
+    ('Laru', 
+     (  # one star condition
+         ('Harmaja', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
+         ('eira', 'self.wind_max>=6 and self.wind_dir>=180 and self.wind_dir<=240')
+     ),
+     (  # two star condition
+         ('Harmaja', 'self.wind_speed>=8 and self.wind_dir>=185 and self.wind_dir<=235'),
+         ('eira', 'self.wind_max>=7 and self.wind_dir>=185 and self.wind_dir<=235')
+     ),
+     (  # three star condition
+         ('Harmaja', 'self.wind_speed>=10 and self.wind_dir>=186 and self.wind_dir<=220'),
+         ('eira', 'self.wind_max>=8 and self.wind_dir>=186 and self.wind_dir<=220')
+     )
+ ),
+    ('Kallvik', 
+     ( # one star condition
+         ('Eestiluoto', 'self.wind_speed>=6 and self.wind_dir>=85 and self.wind_dir<=290'),
+     ),
+     ( # two star condition
+         ('Eestiluoto', 'self.wind_speed>=8 and self.wind_dir>=100 and self.wind_dir<=180'),
+     )
+ ),
+    ('Eira', 
+     ( # one star condition
+         ('Harmaja', 'self.wind_speed>=7 and self.wind_dir>=110 and self.wind_dir<=200'),
+         ('eira', 'self.wind_max>=6 and self.wind_dir>=110 and self.wind_dir<=200')
+     ),
+     ( # two star condition
+         ('Harmaja', 'self.wind_speed>=9 and self.wind_dir>=120 and self.wind_dir<=180'),
+         ('eira', 'self.wind_max>=7 and self.wind_dir>=120 and self.wind_dir<=180')
+     )
+ ),
+    ('Tullari', 
+     ( # one star condition
+         ('Tulliniemi', 'self.wind_speed>=7 and self.wind_dir>=86 and self.wind_dir<=205'),
+     ),
+     ( # two star condition
+         ('Tulliniemi', 'self.wind_speed>=9 and self.wind_dir>=90 and self.wind_dir<=180'),
+     ),
+     ( # three star condition
+         ('Tulliniemi', 'self.wind_speed>=10 and self.wind_dir>=95 and self.wind_dir<=170'),
+     )
+ ),
+    ('Silveri', 
+     ( # one star condition
+         ('Tulliniemi', 'self.wind_speed>=7 and self.wind_dir>=270 or self.wind_dir<=20'),
+     ),
+     ( # two star condition
+         ('Tulliniemi', 'self.wind_speed>=9 and self.wind_dir>=280 or self.wind_dir<=320'),
+     )
+ ),
+    ('Veda', 
+     ( # one star condition
+         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=110 and self.wind_dir<=260'),
+     )
+ ),
+    ('4TT', 
+     ( # one star condition
+         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=160 and self.wind_dir<=240'),
+     )
+ ),
+    ('Slaktis', 
+     ( # one star condition
+         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=235 and self.wind_dir<=275'),
+     )
+ ),
+    ('Yyteri', 
+     ( # one star condition
+         ('Tahkoluoto', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315'),
+     )
+ ),
+    ('Pollari', 
+     ( # one star condition
+         ('Tahkoluoto', 'self.wind_speed>=8 and self.wind_dir>=215 and self.wind_dir<=280'),
+     )
+ ),
 ]
 
 ilmlurl = "http://ilmatieteenlaitos.fi/suomen-havainnot?p_p_id=stationstatusportlet_WAR_fmiwwwweatherportlets&p_r_p_1689542720_parameter=21&"
@@ -579,20 +634,33 @@ def nameToVar(a):
 
 nullStation = DataGather('', '')
 
+# [ (spot, ( (station1, condition1), (station2, condition2) ), 
+#          ( (station1, condition3), (station2, condition3) ), ) ]
+
 def onkoSpotillaKelia(spot):
-    first = True
-    ret = False
-    for station in spot:
-        if not first:
+#    print >>sys.stderr, "spot: ", spot
+    stars = 0
+    spotname = spot[0]
+    for conditions in spot[1:]:
+        add_star = False
+        for station in conditions:
+            if len(station) < 2:
+                continue
             name = station[0]
+#            print >>sys.stderr, "name: ", name
             if not S[name].oldTime() and S[name].found:
                 condition = station[1]
                 condition = condition.replace('self.', 'S["'+name+'"].')
                 ret = eval(condition)
-                if not ret:
-                    return False
-        first = False
-    return ret
+#                print >>sys.stderr, name, condition, ret
+                if ret:
+                    add_star = True
+                else:
+                    add_star = False
+                    break
+        if add_star:
+            stars += 1
+    return stars
 
 S = {} # stations to use when checking wind on spots
 list = []
@@ -730,7 +798,8 @@ print '	</tr>'
 
 for spot in spots:
     print '<tr class="',
-    if onkoSpotillaKelia(spot):
+    stars = onkoSpotillaKelia(spot)
+    if stars > 0:
         print "kelia",
     elif odd:
         print "odd",
@@ -739,7 +808,11 @@ for spot in spots:
     print '">'
     odd = 1 - odd
     print '  <td align="left"><b>', spot[0], '</b></td>'
-    print '  <td>&nbsp;&nbsp;&nbsp;</td>'
+    print '  <td>'
+    while stars > 0:
+        stars -= 1
+        print '&#9733;'
+    print '</td>'
     print '</tr>'
 print '	</table>'
 
