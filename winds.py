@@ -72,7 +72,7 @@ else:
              ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=80 and self.wind_dir<=200'),
              ("FmiBeta", "Russarö", "100932"),
 #             ("Yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
-             ("FmiBeta", "Tahkoluoto", "101267"),
+             ("FmiBeta", "Tahkoluoto", "101267", '', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315'),
              ("FmiBeta", "Tankar", "101661"),
              ("FmiBeta", "Ulkokalla", "101673"),
              ]
@@ -133,12 +133,18 @@ spots = [
          ('Tulliniemi', 'self.wind_speed>=7 and self.wind_dir>=270 or self.wind_dir<=20'),
      ),
      ( # two star condition
-         ('Tulliniemi', 'self.wind_speed>=9 and self.wind_dir>=280 or self.wind_dir<=320'),
+         ('Tulliniemi', 'self.wind_speed>=9 and self.wind_dir>=280 and self.wind_dir<=320'),
      )
  ),
     ('Veda', 
      ( # one star condition
          ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=110 and self.wind_dir<=260'),
+     ),
+     ( # two star condition
+         ('Tulliniemi', 'self.wind_speed>=9 and self.wind_dir>=110 and self.wind_dir<=260'),
+     ),
+     ( # three star condition
+         ('Tulliniemi', 'self.wind_speed>=10 and self.wind_dir>=160 and self.wind_dir<=230'),
      )
  ),
     ('4TT', 
@@ -154,11 +160,23 @@ spots = [
     ('Yyteri', 
      ( # one star condition
          ('Tahkoluoto', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315'),
+     ),
+     ( # two star condition
+         ('Tahkoluoto', 'self.wind_speed>=9 and self.wind_dir>=210 and self.wind_dir<=280'),
+     ),
+     ( # three star condition
+         ('Tahkoluoto', 'self.wind_speed>=10 and self.wind_dir>=210 and self.wind_dir<=280'),
      )
  ),
     ('Pollari', 
      ( # one star condition
          ('Tahkoluoto', 'self.wind_speed>=8 and self.wind_dir>=215 and self.wind_dir<=280'),
+     ),
+     ( # two star condition
+         ('Tahkoluoto', 'self.wind_speed>=9 and self.wind_dir>=225 and self.wind_dir<=270'),
+     ),
+     ( # three star condition
+         ('Tahkoluoto', 'self.wind_speed>=8 and self.wind_dir>=230 and self.wind_dir<=260'),
      )
  ),
 ]
@@ -676,6 +694,19 @@ for v in stations:
             S[nameToVar(gatherer.name)] = nullStation
     except IOError:
         print "IOError on ", v[1]
+
+# test data
+# S["Harmaja"].wind_speed = 11
+# S["Harmaja"].wind_dir = 140
+# S["Harmaja"].found = False
+# S["eira"].wind_max = 9
+# S["eira"].wind_dir = 190
+# S["Eestiluoto"].wind_speed = 8
+# S["Eestiluoto"].wind_dir = 230
+# S["Tulliniemi"].wind_speed = 12
+# S["Tulliniemi"].wind_dir = 170
+# S["Tahkoluoto"].wind_speed = 12
+# S["Tahkoluoto"].wind_dir = 229
 
 if "SERVER_NAME" in os.environ:
     print 'Content-Type: text/html'
