@@ -697,9 +697,10 @@ for v in stations:
 
 # test data
 # S["Harmaja"].wind_speed = 11
-# S["Harmaja"].wind_dir = 140
+# S["Harmaja"].wind_dir = 190
 # S["Harmaja"].found = False
-# S["eira"].wind_max = 9
+# S["eira"].time = "08:00"
+# S["eira"].wind_max = 3
 # S["eira"].wind_dir = 190
 # S["Eestiluoto"].wind_speed = 8
 # S["Eestiluoto"].wind_dir = 230
@@ -707,6 +708,8 @@ for v in stations:
 # S["Tulliniemi"].wind_dir = 170
 # S["Tahkoluoto"].wind_speed = 12
 # S["Tahkoluoto"].wind_dir = 229
+
+#print >>sys.stderr, "eira time", S["eira"].time
 
 if "SERVER_NAME" in os.environ:
     print 'Content-Type: text/html'
