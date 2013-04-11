@@ -64,12 +64,12 @@ else:
              ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("FmiBeta", "Hel.Majakka", "101003"),
              ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>=5 and self.wind_dir>=180 and self.wind_dir<=240'),
-             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>=5 and self.wind_dir>=180 and self.wind_dir<=240'),
+             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("FmiBeta", "Bågaskär", "100969"),
              ("FmiBeta", "Jussarö", "100965"),
 #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
-             ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=80 and self.wind_dir<=200'),
+             ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=85 and self.wind_dir<=205'),
              ("FmiBeta", "Russarö", "100932"),
 #             ("Yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
              ("FmiBeta", "Tahkoluoto", "101267", '', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315'),
@@ -119,7 +119,7 @@ spots = [
  ),
     ('Tullari', 
      ( # one star condition
-         ('Tulliniemi', 'self.wind_speed>=7 and self.wind_dir>=86 and self.wind_dir<=205'),
+         ('Tulliniemi', 'self.wind_speed>=7 and self.wind_dir>=85 and self.wind_dir<=205'),
      ),
      ( # two star condition
          ('Tulliniemi', 'self.wind_speed>=9 and self.wind_dir>=90 and self.wind_dir<=180'),
@@ -700,7 +700,7 @@ for v in stations:
 # S["Harmaja"].wind_dir = 190
 # S["Harmaja"].found = False
 # S["eira"].time = "08:00"
-# S["eira"].wind_max = 3
+# S["eira"].wind_max = 7
 # S["eira"].wind_dir = 190
 # S["Eestiluoto"].wind_speed = 8
 # S["Eestiluoto"].wind_dir = 230
@@ -731,6 +731,9 @@ print 'table.lboardsnip tr.head th {background-color:#3D3D33;color:#CCCCC2;font-
 print 'table.lboardsnip tr.odd {background-color:#CCCCC2;}'
 print 'table.lboardsnip tr.even {background-color:#DCDCD2;}'
 print 'table.lboardsnip tr.kelia {background-color:#D2F1D2;}'
+print 'table.lboardsnip td.even {background-color:#CCCCC2;}'
+print 'table.lboardsnip td.odd {background-color:#DCDCD2;}'
+print 'table.lboardsnip td.kelia {background-color:#D2F1D2;}'
 print 'table.lboardsnip tr.oldtime {color:#909090; background-color:#DCDCD2;}'
 print 'table.lboardsnip tr.foot td {background-color:#AAAAA0;font-weight:normal;padding-left:4px;}'
 print 'table.lboardsnip .lal {padding-left:4px;}'
@@ -749,6 +752,9 @@ print '    <script>'
 print '      window.onload = function(){'
 print '      setDataDir("wind_data/");'
 print '      initGraph(false);'
+print '      t1 = document.getElementById("wind_table");'
+print '      t2 = document.getElementById("spot_table");'
+print '      t2.style.width = "" + t1.offsetWidth + "px";'
 print '      };'
 print '    </script>'
 print '  </head>'
@@ -756,7 +762,7 @@ print '  </head>'
 print '<table  cellpadding="0" cellspacing="0">'
 print '  <tr>'
 print '    <td>'
-print '    <table class="lboardsnip" cellpadding="0" cellspacing="0">'
+print '    <table id="wind_table" class="lboardsnip" cellpadding="0" cellspacing="0">'
 print '      <tbody>'
 print '	<tr class="head">'
 print '	  <th colspan="6"'
@@ -802,7 +808,7 @@ print '    </table>'
 print '    </td>'
 print '    <td>'
 print '   <div id="station_name"></div>'
-print '  <canvas id="graphCanvas" width="600" height="300">'
+print '  <canvas id="graphCanvas" width="600" height="270">'
 print '    </canvas>'
 print '   <select title="Select number of days to show" name="days" id="days"'
 print '   style="display:none" onchange="changeDays(this.value);">'
@@ -817,22 +823,28 @@ print '    </td>'
 print '  </tr>'
 print '    </table>'
 
-print '<br/><a href="forecasts.html">Ennusteet</a><br/><br/>'
-print '<a href="http://testbed.fmi.fi/history_browser.php?imgtype=wind&t=15&n=1">Testbed</a><br/><br/>'
-print '<a href="winds_ee.html">Eesti asemat</a><br/><br/>'
-
-print '<table class="lboardsnip" cellpadding="0" cellspacing="0">'
+print '<table id="spot_table" class="lboardsnip" cellpadding="0" cellspacing="0">'
 print '      <tbody>'
 print '	<tr class="head">'
-print '	  <th colspan="2"'
+print '	  <th colspan="4"'
 print '	      style="padding-left: 4px;" align="left">'
 print '	    <div style="margin-top: 4px;">Spotit</div>'
 print '	  </th>'
 print '	</tr>'
 
-for spot in spots:
-    print '<tr class="',
+for i, spot in zip(range(len(spots)), spots):
+    if i % 2 == 0:
+        print '<tr>'
     stars = onkoSpotillaKelia(spot)
+    print '  <td width="25%" align="left" class="',
+    if stars > 0:
+        print "kelia",
+    elif odd:
+        print "odd",
+    else:
+        print "even",
+    print '"><b>', spot[0], '</b></td>'
+    print ' <td width="25%" class="',
     if stars > 0:
         print "kelia",
     elif odd:
@@ -840,17 +852,20 @@ for spot in spots:
     else:
         print "even",
     print '">'
-    odd = 1 - odd
-    print '  <td align="left"><b>', spot[0], '</b></td>'
-    print '  <td>'
     while stars > 0:
         stars -= 1
         print '&#9733;'
     print '</td>'
-    print '</tr>'
+    if i % 2 == 1:
+        print '</tr>'
+        odd = 1 - odd
 print '	</table>'
 
-print '<br/><br/>'
+print '<br/>'
+print '<br/><a href="forecasts.html">Ennusteet</a><br/><br/>'
+print '<a href="http://testbed.fmi.fi/history_browser.php?imgtype=wind&t=15&n=1">Testbed</a><br/><br/>'
+print '<a href="winds_ee.html">Eesti asemat</a><br/><br/>'
+
 print ' </html>'
 #dir = 'ttt/'
 if os.uname()[1] == 'kopsu.com':

@@ -54,7 +54,7 @@ def getMeasurements(station, duration, param):
     if duration >= 14:
         timestep = 60
     query_url = baseurl + 'fmi-apikey/' + apikey + '/wfs?' + 'request=' + request + '&storedquery_id=' + query + '&fmisid=' + station +  '&parameters=' + param + '&starttime=' + starttime + '&endtime=' + endtime + '&timestep=' + str(timestep)
-#    print query_url
+#    print >>sys.stderr, query_url
     return getUrl(query_url)
 
 def formatTime(tm):
