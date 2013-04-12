@@ -10,7 +10,8 @@ import re
 import datetime
 
 baseurl = 'http://data.fmi.fi/'
-apikey = 'b37f3e99-cdb8-4858-b850-bfffea6542f9'
+apikey = ''
+#apikey = 'b37f3e99-cdb8-4858-b850-bfffea6542f9'
 request = 'getFeature'
 #query = 'fmi::observations::weather::multipointcoverage'
 query = 'fmi::observations::weather::timevaluepair'
@@ -26,6 +27,15 @@ timestep = 1
 #http://data.fmi.fi/fmi-apikey/b37f3e99-cdb8-4858-b850-bfffea6542f9/wfs?request=getFeature&storedquery_id=fmi::observations::weather::timevaluepair&place=jaala&timestep=30
 #http://data.fmi.fi/fmi-apikey/b37f3e99-cdb8-4858-b850-bfffea6542f9/wfs?request=getFeature&storedquery_idfmi::observations::weather::timevaluepair&place=Harmaja&timestep=10
 
+def getApiKey():
+    global apikey
+    if not apikey:
+        api_key_file = 'fmi_api_key.txt'
+        f = open(api_key_file, "r")
+        apikey = f.read();
+        apikey = apikey.replace('\n', '')
+        f.close()
+    return apikey
 
 def getTime(start):
     return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() - start*24*3600))
@@ -53,7 +63,7 @@ def getMeasurements(station, duration, param):
         timestep = 30
     if duration >= 14:
         timestep = 60
-    query_url = baseurl + 'fmi-apikey/' + apikey + '/wfs?' + 'request=' + request + '&storedquery_id=' + query + '&fmisid=' + station +  '&parameters=' + param + '&starttime=' + starttime + '&endtime=' + endtime + '&timestep=' + str(timestep)
+    query_url = baseurl + 'fmi-apikey/' + getApiKey() + '/wfs?' + 'request=' + request + '&storedquery_id=' + query + '&fmisid=' + station +  '&parameters=' + param + '&starttime=' + starttime + '&endtime=' + endtime + '&timestep=' + str(timestep)
 #    print >>sys.stderr, query_url
     return getUrl(query_url)
 
