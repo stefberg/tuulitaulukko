@@ -852,6 +852,8 @@ for i, spot in zip(range(len(spots)), spots):
     else:
         print "even",
     print '">'
+    if stars == 0:
+        print '&#9785;'
     while stars > 0:
         stars -= 1
         print '&#9733;'
