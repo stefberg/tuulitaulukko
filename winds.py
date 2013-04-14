@@ -66,7 +66,7 @@ else:
              ("FmiBeta", "Hel.Majakka", "101003"),
              ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>=5 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
-             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
+#             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("FmiBeta", "Bågaskär", "100969"),
              ("FmiBeta", "Jussarö", "100965"),
 #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
