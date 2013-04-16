@@ -507,7 +507,7 @@ class DataGather(object):
             self.name = initData[1]
         else:
             self.name = ''
-        self.time = 0
+        self.time = "00:00"
         self.wind_dir = 0
         self.wind_low = 0
         self.wind_speed = 0
@@ -670,7 +670,7 @@ def onkoSpotillaKelia(spot):
                 continue
             name = station[0]
 #            print >>sys.stderr, "name: ", name
-            if not S[name].oldTime() and S[name].found:
+            if S[name].found and not S[name].oldTime():
                 condition = station[1]
                 condition = condition.replace('self.', 'S["'+name+'"].')
                 ret = eval(condition)
@@ -743,8 +743,10 @@ print 'table.lboardsnip tr.foot td {background-color:#AAAAA0;font-weight:normal;
 print 'table.lboardsnip .lal {padding-left:4px;}'
 print '.larr {background:url(http://i.pga.com/pga/images/pgachampionship/img/icon_linkarrR.gif) no-repeat;padding-left:6px;display:inline;font-size:10px;font-weight:bold; }'
 print '.lal {text-align:left;}'
-print 'a:link, a:visited, a:hover, a:active {text-decoration:none;color:#3D3D33;}'
-print 'a:hover {text-decoration:underline;}'
+print 'a:link, a:visited, a:hover, a:active {color:#3D3D33;}'
+#print 'a:hover {font-weight:bold;}'
+print 'select {font-size:9px;}'
+print 'option {font-size:9px;}'
 print 'td {white-space:nowrap}'
 print '    </style>'
 print '<META HTTP-EQUIV="REFRESH" CONTENT="600">'
@@ -799,7 +801,7 @@ for l in list:
             print "even",
     print '">'
     odd = 1 - odd
-    print '	  <td align="left"><a href="' + l.info_url + '"><b>' + l.name + '</b></a></td>'
+    print '	  <td align="left"><a href="' + l.info_url + '">' + l.name + '</a></td>'
     print '	  <td>' + str(l.time) + '</td>'
     print '	  <td><a href="javascript:showStation(\'' + l.name + '\', 2)">' + str(l.wind_dir) + '</a></td>'
     print '	  <td><a href="javascript:showStation(\'' + l.name + '\', 0)">' + str(l.wind_speed) + '</a></td>'
@@ -812,7 +814,7 @@ print '    </table>'
 print '    </td>'
 print '    <td>'
 print '   <div id="station_name"></div>'
-print '  <canvas id="graphCanvas" width="600" height="270">'
+print '  <canvas id="graphCanvas" width="550" height="260">'
 print '    </canvas>'
 print '   <select title="Select number of days to show" name="days" id="days"'
 print '   style="display:none" onchange="changeDays(this.value);">'
@@ -847,7 +849,7 @@ for i, spot in zip(range(len(spots)), spots):
         print "odd",
     else:
         print "even",
-    print '"><b>', spot[0], '</b></td>'
+    print '">', spot[0], '</td>'
     print ' <td width="25%" class="',
     if stars > 0:
         print "kelia",

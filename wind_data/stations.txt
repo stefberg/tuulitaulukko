@@ -1,4 +1,4 @@
-2013,103
+2013,106
 Emäsalo
 Kalbådagrund
 Eestiluoto
@@ -6,7 +6,6 @@ Harmaja
 Hel.Majakka
 koivusaari
 eira
-nuottaniemi
 Bågaskär
 Jussarö
 Tulliniemi
