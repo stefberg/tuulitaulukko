@@ -61,11 +61,11 @@ else:
 #             ("Remlog", "kalliosaari", "http://www.remlog.com/cgi/tplog.pl?node=kalliosaari"),
              ("FmiBeta", "Emäsalo", "101023"),
              ("FmiBeta", "Kalbådagrund", "101022"),
-             ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=6 and self.wind_dir>=85 and self.wind_dir<=290'),
+             ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=85 and self.wind_dir<=290'),
              ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("FmiBeta", "Hel.Majakka", "101003"),
              ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>=5 and self.wind_dir>=180 and self.wind_dir<=240'),
-             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
+             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>=6 and self.wind_dir>=180+10 and self.wind_dir<=240+10'), # 10 deg off at the moment
 #             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("FmiBeta", "Bågaskär", "100969"),
              ("FmiBeta", "Jussarö", "100965"),
@@ -89,52 +89,52 @@ spots = [
     ('Laru', 
      (  # one star condition
          ('Harmaja', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
-         ('eira', 'self.wind_max>=6 and self.wind_dir>=180 and self.wind_dir<=240')
+         ('eira', 'self.wind_max>=6 and self.wind_dir>=180+10 and self.wind_dir<=240+10') # seems 10 deg off
      ),
      (  # two star condition
          ('Harmaja', 'self.wind_speed>=8 and self.wind_dir>=185 and self.wind_dir<=235'),
-         ('eira', 'self.wind_max>=7 and self.wind_dir>=185 and self.wind_dir<=235')
+         ('eira', 'self.wind_max>=7 and self.wind_dir>=185+10 and self.wind_dir<=235+10')
      ),
      (  # three star condition
          ('Harmaja', 'self.wind_speed>=10 and self.wind_dir>=186 and self.wind_dir<=220'),
-         ('eira', 'self.wind_max>=8 and self.wind_dir>=186 and self.wind_dir<=220')
+         ('eira', 'self.wind_max>=8 and self.wind_dir>=186+10 and self.wind_dir<=220+10')
      )
  ),
     ('Kallvik', 
      ( # one star condition
-         ('Eestiluoto', 'self.wind_speed>=6 and self.wind_dir>=85 and self.wind_dir<=290'),
+         ('Eestiluoto', 'self.wind_speed>=7 and self.wind_dir>=85 and self.wind_dir<=290'),
      ),
      ( # two star condition
-         ('Eestiluoto', 'self.wind_speed>=8 and self.wind_dir>=100 and self.wind_dir<=180'),
+         ('Eestiluoto', 'self.wind_speed>=9 and self.wind_dir>=100 and self.wind_dir<=180'),
      )
  ),
     ('Eira', 
      ( # one star condition
          ('Harmaja', 'self.wind_speed>=7 and self.wind_dir>=110 and self.wind_dir<=200'),
-         ('eira', 'self.wind_max>=6 and self.wind_dir>=110 and self.wind_dir<=200')
+         ('eira', 'self.wind_max>=6 and self.wind_dir>=110+10 and self.wind_dir<=200+10')
      ),
      ( # two star condition
          ('Harmaja', 'self.wind_speed>=9 and self.wind_dir>=120 and self.wind_dir<=180'),
-         ('eira', 'self.wind_max>=7 and self.wind_dir>=120 and self.wind_dir<=180')
+         ('eira', 'self.wind_max>=7 and self.wind_dir>=120+10 and self.wind_dir<=180+10')
      )
  ),
     ('Tullari', 
      ( # one star condition
-         ('Tulliniemi', 'self.wind_speed>=7 and self.wind_dir>=85 and self.wind_dir<=205'),
+         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=85 and self.wind_dir<=205'),
      ),
      ( # two star condition
-         ('Tulliniemi', 'self.wind_speed>=9 and self.wind_dir>=90 and self.wind_dir<=180'),
+         ('Tulliniemi', 'self.wind_speed>=10 and self.wind_dir>=90 and self.wind_dir<=180'),
      ),
      ( # three star condition
-         ('Tulliniemi', 'self.wind_speed>=10 and self.wind_dir>=95 and self.wind_dir<=170'),
+         ('Tulliniemi', 'self.wind_speed>=12 and self.wind_dir>=95 and self.wind_dir<=170'),
      )
  ),
     ('Silveri', 
      ( # one star condition
-         ('Tulliniemi', 'self.wind_speed>=7 and self.wind_dir>=270 or self.wind_dir<=20'),
+         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=270 or self.wind_dir<=20'),
      ),
      ( # two star condition
-         ('Tulliniemi', 'self.wind_speed>=9 and self.wind_dir>=280 and self.wind_dir<=320'),
+         ('Tulliniemi', 'self.wind_speed>=10 and self.wind_dir>=280 and self.wind_dir<=320'),
      )
  ),
     ('Veda', 
@@ -142,10 +142,10 @@ spots = [
          ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=110 and self.wind_dir<=260'),
      ),
      ( # two star condition
-         ('Tulliniemi', 'self.wind_speed>=9 and self.wind_dir>=110 and self.wind_dir<=260'),
+         ('Tulliniemi', 'self.wind_speed>=10 and self.wind_dir>=110 and self.wind_dir<=260'),
      ),
      ( # three star condition
-         ('Tulliniemi', 'self.wind_speed>=10 and self.wind_dir>=160 and self.wind_dir<=230'),
+         ('Tulliniemi', 'self.wind_speed>=12 and self.wind_dir>=160 and self.wind_dir<=230'),
      )
  ),
     ('4TT', 
