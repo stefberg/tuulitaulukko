@@ -18,7 +18,7 @@ minute=time.tm_min
 
 entityChars = {"auml" : "ä", "ouml" : "ö", "aring" : "å", "nbsp" : " ", "Auml" : "Ä", "Ouml" : "Ö", "Aring" : "å"}
 
-if os.uname()[1] == 'kopsu.com':
+if os.uname()[1] == 'XXXX': # old station list kept here for a while
     stations = [ 
 #             ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
 #             ("remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),

@@ -30,7 +30,13 @@ timestep = 1
 def getApiKey():
     global apikey
     if not apikey:
-        api_key_file = 'fmi_api_key.txt'
+        if os.uname()[1] == 'kopsu.com':
+            dir = '/home/webadmin/kopsu.com/winds/'
+        elif os.uname()[1] == 'Macintosh.local':
+            dir = './'
+        else:
+            dir = '/hsphere/local/home/saberg/winds/'
+        api_key_file = dir + 'fmi_api_key.txt'
         f = open(api_key_file, "r")
         apikey = f.read();
         apikey = apikey.replace('\n', '')
