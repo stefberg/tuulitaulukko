@@ -55,12 +55,11 @@ if os.uname()[1] == 'XXXX': # old station list kept here for a while
 
 else:
     stations = [ 
-#             ("Remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
-#             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
-#             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti"),
-#             ("Remlog", "kalliosaari", "http://www.remlog.com/cgi/tplog.pl?node=kalliosaari"),
              ("FmiBeta", "Emäsalo", "101023"),
              ("FmiBeta", "Kalbådagrund", "101022"),
+#             ("Remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
+#             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
+             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti"),
              ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=85 and self.wind_dir<=290'),
              ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("FmiBeta", "Hel.Majakka", "101003"),
@@ -103,9 +102,11 @@ spots = [
     ('Kallvik', 
      ( # one star condition
          ('Eestiluoto', 'self.wind_speed>=7 and self.wind_dir>=85 and self.wind_dir<=290'),
+         ('apinalahti', 'self.wind_speed>=5 and self.wind_dir>=85 and self.wind_dir<=290')
      ),
      ( # two star condition
          ('Eestiluoto', 'self.wind_speed>=9 and self.wind_dir>=100 and self.wind_dir<=180'),
+         ('apinalahti', 'self.wind_speed>=7 and self.wind_dir>=100 and self.wind_dir<=180')
      )
  ),
     ('Eira', 
@@ -555,12 +556,12 @@ class YyteriGather(DataGather):
 class RemlogGather(DataGather):
 
     def __init__(self, initData):
-        self.page_url = ilmlurl + initData[2]
-        super(RemlogGather, self).__init__(initData, ilmlurl + initData[2])
+        self.page_url = remlog + initData[1]
+        super(RemlogGather, self).__init__(initData, initData[2])
 
     def doGather(self):
-        self.page = getUrl(remlog + initData[1])
-        self.parser = RemlogParser(initData[2])
+        self.page = getUrl(self.page_url)
+        self.parser = RemlogParser(self.info_url)
         self.parser.feed(self.page)
         self.parser.close()
         if self.parser.found:
