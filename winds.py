@@ -101,8 +101,8 @@ spots = [
  ),
     ('Kallvik', 
      ( # one star condition
-         ('Eestiluoto', 'self.wind_speed>=7 and self.wind_dir>=85 and self.wind_dir<=290'),
-         ('apinalahti', 'self.wind_speed>=5 and self.wind_dir>=85 and self.wind_dir<=290')
+         ('Eestiluoto', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
+         ('apinalahti', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290')
      ),
      ( # two star condition
          ('Eestiluoto', 'self.wind_speed>=9 and self.wind_dir>=100 and self.wind_dir<=180'),
