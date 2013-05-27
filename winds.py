@@ -121,7 +121,7 @@ spots = [
  ),
     ('Tullari', 
      ( # one star condition
-         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=85 and self.wind_dir<=205'),
+         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=78 and self.wind_dir<=205'),
      ),
      ( # two star condition
          ('Tulliniemi', 'self.wind_speed>=10 and self.wind_dir>=90 and self.wind_dir<=180'),
