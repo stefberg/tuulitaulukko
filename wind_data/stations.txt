@@ -1,4 +1,4 @@
-2013,139
+2013,168
 Emäsalo
 Kalbådagrund
 apinalahti
@@ -11,6 +11,7 @@ Bågaskär
 Jussarö
 Tulliniemi
 Russarö
+yyteri
 Tahkoluoto
 Tankar
 Ulkokalla

@@ -60,7 +60,7 @@ else:
 #             ("Remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
 #             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
              ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti"),
-             ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=85 and self.wind_dir<=290'),
+             ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("FmiBeta", "Hel.Majakka", "101003"),
              ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>=5 and self.wind_dir>=180 and self.wind_dir<=240'),
@@ -69,9 +69,9 @@ else:
              ("FmiBeta", "Bågaskär", "100969"),
              ("FmiBeta", "Jussarö", "100965"),
 #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
-             ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=85 and self.wind_dir<=205'),
+             ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=78 and self.wind_dir<=205'),
              ("FmiBeta", "Russarö", "100932"),
-#             ("Yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
+             ("Yyteri", "yyteri", "http://www.purjelautaliitto.fi/yyteriweather/", '', 'self.wind_speed>=5 and self.wind_dir>=170 and self.wind_dir<=315'),
              ("FmiBeta", "Tahkoluoto", "101267", '', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315'),
              ("FmiBeta", "Tankar", "101661"),
              ("FmiBeta", "Ulkokalla", "101673"),
@@ -102,11 +102,11 @@ spots = [
     ('Kallvik', 
      ( # one star condition
          ('Eestiluoto', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
-         ('apinalahti', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290')
+#         ('apinalahti', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290')
      ),
      ( # two star condition
          ('Eestiluoto', 'self.wind_speed>=9 and self.wind_dir>=100 and self.wind_dir<=180'),
-         ('apinalahti', 'self.wind_speed>=7 and self.wind_dir>=100 and self.wind_dir<=180')
+#         ('apinalahti', 'self.wind_speed>=7 and self.wind_dir>=100 and self.wind_dir<=180')
      )
  ),
     ('Eira', 
@@ -165,12 +165,15 @@ spots = [
     ('Yyteri', 
      ( # one star condition
          ('Tahkoluoto', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315'),
+         ('yyteri', 'self.wind_speed>=5 and self.wind_dir>=170 and self.wind_dir<=315'),
      ),
      ( # two star condition
          ('Tahkoluoto', 'self.wind_speed>=9 and self.wind_dir>=210 and self.wind_dir<=280'),
+         ('yyteri', 'self.wind_speed>=6 and self.wind_dir>=210 and self.wind_dir<=280'),
      ),
      ( # three star condition
          ('Tahkoluoto', 'self.wind_speed>=10 and self.wind_dir>=210 and self.wind_dir<=280'),
+         ('yyteri', 'self.wind_speed>=8 and self.wind_dir>=210 and self.wind_dir<=280'),
      )
  ),
     ('Pollari', 
@@ -188,7 +191,7 @@ spots = [
 
 ilmlurl = "http://ilmatieteenlaitos.fi/suomen-havainnot?p_p_id=stationstatusportlet_WAR_fmiwwwweatherportlets&p_r_p_1689542720_parameter=21&"
 remlog = "http://www.remlog.com/cgi/tplast.pl?node="
-yyteriUrl="http://surfkeskus.dyndns.org/saa/"
+yyteriUrl="http://www.purjelautaliitto.fi/yyteriweather/"
 saapalveluUrl="http://www.saapalvelu.fi"
 
 def getUrl(url):
