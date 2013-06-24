@@ -550,11 +550,11 @@ class YyteriGather(DataGather):
         if self.parser.found:
             self.found = True
             self.time = self.parser.time
-            self.wind_dir = self.parser.wind_dir
-            self.wind_low = self.parser.wind_low
-            self.wind_speed = self.parser.wind_speed
-            self.wind_max = self.parser.wind_max
-            self.temp = self.parser.temp
+            self.wind_dir = float(self.parser.wind_dir)
+            self.wind_low = float(self.parser.wind_low)
+            self.wind_speed = float(self.parser.wind_speed)
+            self.wind_max = float(self.parser.wind_max)
+            self.temp = float(self.parser.temp)
 
 class RemlogGather(DataGather):
 
@@ -574,7 +574,7 @@ class RemlogGather(DataGather):
             self.wind_low = float(self.parser.wind_low)
             self.wind_speed = float(self.parser.wind_speed)
             self.wind_max = float(self.parser.wind_max)
-            self.temp = self.parser.temp
+            self.temp = float(self.parser.temp)
 
 class IlmlGather(DataGather):
 
