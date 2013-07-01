@@ -9,7 +9,7 @@ import sys
 
 url = 'http://www.emhi.ee/ilma_andmed/xml/observations.php'
 infoUrl = 'http://www.emhi.ee/index.php?ide=15&v_kiht=1'
-codes = ["86093", "86094", "26115", "26218", "26231"]
+codes = ["86093", "86094", "26120", "26115", "26218", "26231"]
 stationsTable = {}
 
 def getUrl(url):
@@ -59,7 +59,7 @@ print '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"'
 print '  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
 print '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">'
 print '  <head>'
-print '    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>'
+print '    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>'
 print '    <title>Eesti Asemat</title>'
 print '    <style type="text/css">'
 print '    v\:* {'
