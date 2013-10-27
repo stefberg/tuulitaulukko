@@ -27,6 +27,8 @@ timestep = 1
 #http://data.fmi.fi/fmi-apikey/b37f3e99-cdb8-4858-b850-bfffea6542f9/wfs?request=getFeature&storedquery_id=fmi::observations::weather::timevaluepair&place=jaala&timestep=30
 #http://data.fmi.fi/fmi-apikey/b37f3e99-cdb8-4858-b850-bfffea6542f9/wfs?request=getFeature&storedquery_idfmi::observations::weather::timevaluepair&place=Harmaja&timestep=10
 
+now_is_dst = time.localtime().tm_isdst
+
 def getApiKey():
     global apikey
     if not apikey:
@@ -81,7 +83,7 @@ def formatTime(tm):
     day = reg.group(3)
     hour = reg.group(4)
     minute = reg.group(5)
-    if time.daylight:
+    if now_is_dst:
         tzone = time.altzone
     else:
         tzone = time.timezone
