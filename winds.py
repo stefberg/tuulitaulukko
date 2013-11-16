@@ -75,6 +75,7 @@ else:
              ("FmiBeta", "Tahkoluoto", "101267", '', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315'),
              ("FmiBeta", "Tankar", "101661"),
              ("FmiBeta", "Ulkokalla", "101673"),
+             ("FmiBeta", "Marjaniemi", "101784"),
              ]
 
 #stations = [ ("Ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
@@ -777,7 +778,7 @@ print '      <tbody>'
 print '	<tr class="head">'
 print '	  <th colspan="6"'
 print '	      style="padding-left: 4px;" align="left">'
-print '	    <div style="margin-top: 4px;">Tuulet</div>'
+print '	    <div style="margin-top: 4px;">Tuulet (historiakäyrät klikkaamalla arvoja!)</div>'
 print '	  </th>'
 print '	</tr>'
 

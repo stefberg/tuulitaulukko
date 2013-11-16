@@ -1,7 +1,6 @@
-2013,300
+2013,320
 Emäsalo
 Kalbådagrund
-villinginluoto
 Eestiluoto
 Harmaja
 Hel.Majakka
@@ -15,3 +14,4 @@ yyteri
 Tahkoluoto
 Tankar
 Ulkokalla
+Marjaniemi
