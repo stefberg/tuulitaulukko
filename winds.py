@@ -76,6 +76,7 @@ else:
              ("FmiBeta", "Tankar", "101661"),
              ("FmiBeta", "Ulkokalla", "101673"),
              ("FmiBeta", "Marjaniemi", "101784"),
+             ("FmiBeta", "Vihreäsaari", "101794"),
              ]
 
 #stations = [ ("Ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
