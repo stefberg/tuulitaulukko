@@ -71,7 +71,7 @@ else:
 #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
              ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=78 and self.wind_dir<=205'),
              ("FmiBeta", "Russarö", "100932"),
-             ("Yyteri", "yyteri", "http://www.purjelautaliitto.fi/yyteriweather/", '', 'self.wind_speed>=5 and self.wind_dir>=170 and self.wind_dir<=315'),
+#             ("Yyteri", "yyteri", "http://www.purjelautaliitto.fi/yyteriweather/", '', 'self.wind_speed>=5 and self.wind_dir>=170 and self.wind_dir<=315'),
              ("FmiBeta", "Tahkoluoto", "101267", '', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315'),
              ("FmiBeta", "Tankar", "101661"),
              ("FmiBeta", "Ulkokalla", "101673"),
@@ -642,7 +642,7 @@ class FmiBetaGather(DataGather):
         super(FmiBetaGather, self).__init__(initData, ilmlurl + 'station=' + initData[2])
 
     def doGather(self):
-        self.observations = fetch_data_lib.fetchData(self.station, 0, 'winddirection,windspeedms,windgust,temperature')
+        self.observations = fetch_data_lib.fetchDataNumDays(self.station, 0, 'winddirection,windspeedms,windgust,temperature')
         if len(self.observations) > 0:
             last = len(self.observations[0]) - 1
             if self.observations[0][last].lower() == "nan":
@@ -676,7 +676,7 @@ def onkoSpotillaKelia(spot):
                 continue
             name = station[0]
 #            print >>sys.stderr, "name: ", name
-            if S[name].found and not S[name].oldTime():
+            if name in S and S[name].found and not S[name].oldTime():
                 condition = station[1]
                 condition = condition.replace('self.', 'S["'+name+'"].')
                 ret = eval(condition)

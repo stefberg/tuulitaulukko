@@ -61,7 +61,12 @@ def getText(node):
             allText = allText + text.data
     return allText.encode("utf-8")
 
-def getMeasurements(station, duration, param):
+def getMeasurements(station, starttime, endtime, timestep, param):
+    query_url = baseurl + 'fmi-apikey/' + getApiKey() + '/wfs?' + 'request=' + request + '&storedquery_id=' + query + '&fmisid=' + station +  '&parameters=' + param + '&starttime=' + starttime + '&endtime=' + endtime + '&timestep=' + str(timestep)
+#    print >>sys.stderr, query_url
+    return getUrl(query_url)
+
+def getMeasurementsDuration(station, duration, param):
     if duration == 0:
         duration = (20.0*60)/24.0/3600 # 20 mins in fraction of days
     starttime = getTime(duration);
@@ -71,9 +76,7 @@ def getMeasurements(station, duration, param):
         timestep = 30
     if duration >= 14:
         timestep = 60
-    query_url = baseurl + 'fmi-apikey/' + getApiKey() + '/wfs?' + 'request=' + request + '&storedquery_id=' + query + '&fmisid=' + station +  '&parameters=' + param + '&starttime=' + starttime + '&endtime=' + endtime + '&timestep=' + str(timestep)
-#    print >>sys.stderr, query_url
-    return getUrl(query_url)
+    return getMeasurements(station, starttime, endtime, timestep, param)
 
 def formatTime(tm):
     # 2013-03-23T09:20:00Z
@@ -90,8 +93,7 @@ def formatTime(tm):
     d = datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), 0, 0, None) - datetime.timedelta(0, tzone)
     return d.strftime('%Y,%m,%d,%H,%M,%H:%M')
 
-def fetchData(station, number_of_days, parameter):
-    page = getMeasurements(station, number_of_days, parameter)
+def parseData(page):
     try:
         dom = xml.dom.minidom.parseString(page)
     except:
@@ -113,3 +115,30 @@ def fetchData(station, number_of_days, parameter):
                 measurementsArray.append(measurement_value)
             observationsArray.append(measurementsArray)
     return observationsArray
+
+def fetchData(station, starttime, endtime, timestep, parameter):
+    page = getMeasurements(station, starttime, endtime, timestep, parameter)
+    return parseData(page)
+
+def fetchDataNumDays(station, number_of_days, parameter):
+    page = getMeasurementsDuration(station, number_of_days, parameter)
+    return parseData(page)
+
+class Measurement:
+    def __init__(self, time, dir, speed, gust):
+        tm = time.split(',')
+        self.time = datetime.datetime(int(tm[0]), int(tm[1]), int(tm[2]), int(tm[3]), int(tm[4]))
+        self.dir = dir
+        self.speed = speed
+        self.gust = gust
+
+def feathMeasurementsArray(station, starttime, endtime, steps, params):
+    observations = fetchData(station, starttime, endtime, 30, 'winddirection,windspeedms,windgust')
+    wind_dirs = observations[0]
+    wind_speeds = observations[1]
+    wind_gusts = observations[2]
+    measurements = []
+    for i in range(1, len(wind_dirs)):
+        if i%2:
+            measurements.append(Measurement(wind_dirs[i], float(wind_dirs[i+1]), float(wind_speeds[i+1]), float(wind_gusts[i+1])))
+    return measurements

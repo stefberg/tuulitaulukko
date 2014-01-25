@@ -1,4 +1,4 @@
-2013,320
+2014,18
 Emäsalo
 Kalbådagrund
 Eestiluoto
@@ -10,7 +10,6 @@ Bågaskär
 Jussarö
 Tulliniemi
 Russarö
-yyteri
 Tahkoluoto
 Tankar
 Ulkokalla
