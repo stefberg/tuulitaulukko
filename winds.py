@@ -59,7 +59,7 @@ else:
              ("FmiBeta", "Kalbådagrund", "101022"),
 #             ("Remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
 #             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
-#             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti"),
+             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("FmiBeta", "Hel.Majakka", "101003"),
@@ -104,11 +104,11 @@ spots = [
     ('Kallvik', 
      ( # one star condition
          ('Eestiluoto', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
-#         ('apinalahti', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290')
+         ('apinalahti', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290')
      ),
      ( # two star condition
          ('Eestiluoto', 'self.wind_speed>=9 and self.wind_dir>=100 and self.wind_dir<=180'),
-#         ('apinalahti', 'self.wind_speed>=7 and self.wind_dir>=100 and self.wind_dir<=180')
+         ('apinalahti', 'self.wind_speed>=7 and self.wind_dir>=100 and self.wind_dir<=180')
      )
  ),
     ('Eira', 
