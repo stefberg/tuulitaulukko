@@ -28,7 +28,7 @@ if os.uname()[1] == 'XXXX': # old station list kept here for a while
 #             ("ilml", "Emäsalo", "station=2991&place=Porvoo"), 
 #             ("ilml", "Kalbådagrund", "station=2987&place=Porvoo"),
 #             ("fmibeta", "Eestiluoto", "101029"),
-             ("ilml", "Eestiluoto", "station=2930&place=Helsinki"),
+#             ("ilml", "Eestiluoto", "station=2930&place=Helsinki"),
 #             ("ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
 #             ("fmibeta", "Harmaja", "100996"),
              ("ilml", "Harmaja", "station=2795&place=Helsinki"),
@@ -404,70 +404,129 @@ class SaapalveluParser(HTMLParser):
         self.temp = 'na'
         self.info_url = info_url
         self.found = False
-        self.intable = False;
-        self.intd = False;
         self.intemp = False
         self.inwind = False
-        self.inspan = False
+        self.intempBox = 0
+        self.inwindBox = 0
+        self.intime = 0
+        self.divLevel = 0
         self.row = -1
         self.column = -1
         self.text = ""
 
     def handle_starttag(self, tag, attrs):
-        if tag == "table":
-            self.intable = True
-            self.text = ""
-        if tag == "tr" and self.intable:
-            self.row += 1
-            self.column = -1
-        if tag == "td" and self.intable:
-            self.intd = True
-            self.text = ""
-        if tag == "span":
-            self.inspan = True
-            self.text = ""
+        if tag == "div":
+            self.divLevel += 1
+            if len(attrs) > 0 and attrs[0][0] == 'class' and attrs[0][1] == 'weather-box weather-box-thermometer':
+                self.intempBox = self.divLevel
+#                print >>sys.stderr, attrs[0][1]
+            if len(attrs) > 0 and attrs[0][0] == 'class' and attrs[0][1] == 'weather-box weather-box-wind':
+                self.inwindBox = self.divLevel
+#                print >>sys.stderr, attrs[0][1]
             
     def handle_endtag(self, tag):
-        if tag == "table":
-            self.intable = False
-            self.intemp = False
-            self.inwind = False
-            self.text = ""
-        if tag == "td":
-            self.intd = False
-            self.text = ""
-        if tag == "span":
-            self.inspan = False
-            self.text = ""
+#            self.intemp = False
+#            self.inwind = False
+#            self.text = ""
+        if tag == "div":
+            if self.divLevel == self.intempBox:
+                self.intempBox = 0
+                self.intemp = False
+            if self.divLevel == self.inwindBox:
+                self.inwindBox = 0
+            self.divLevel -= 1
 
     def handle_data(self, data):
         self.text = self.text + " " + data
-        if self.intable and self.intd:
-            if self.text.startswith(" Lmptila"):
-                self.intemp = True
-            if self.text.startswith(" Tuuli"):
-                self.intuuli = True
-            if self.text.startswith(" Keskituuli t") and self.intuuli:
+
+        if self.intemp == 2:
+            reg = re.search('([\-0-9]+\.*[0-9]*)', data)
+            if reg:
+                self.temp = reg.group(1)
+                self.intemp = 0
+#                print >>sys.stderr, "temp: ", self.temp
+
+        if self.intemp and data == "Tll hetkell":
+            self.intemp = 2
+#            print >>sys.stderr, data
+            
+        if self.intempBox and data == "Lmptila":
+            self.intemp = 1
+#            print >>sys.stderr, data
+
+        if self.inwind == 2:
+            reg = re.search('([0-9]+\.*[0-9]*) m/s', data)
+            if reg:
+                self.wind_speed = reg.group(1)
+#                print >>sys.stderr, "wind_speed: ", self.wind_speed
+                self.inwind = 1
                 self.found = True
-                reg = re.search('([0-9]+\.[0-9]+) m/s', self.text)
-                if reg:
-                    self.wind_speed = reg.group(1)
-            if self.text.startswith(" Tuulen nopeus") and self.intuuli:
-                reg = re.search('([0-9]+\.[0-9]+) m/s', self.text)
-                if reg:
-                    self.wind_max = reg.group(1)
-            if self.text.startswith(" Tuulen suunta") and self.intuuli:
-                reg = re.search('10min.* \(([0-9]+)', self.text)
-                if reg:
-                    self.wind_dir = reg.group(1)
-            if self.text.startswith(" T ll  hetkell") and self.intemp:
-                reg = re.search(' ([\-0-9]+\.[0-9])', self.text)
-                if reg:
-                    self.temp = reg.group(1)
-        if self.text.startswith(" P ivittynyt viimeksi:") and self.inspan:
-            reg = re.search(' ([0-9]+:[0-9]+)', self.text)
+
+        if self.inwind == 3:
+            reg = re.search('([0-9]+\.*[0-9]*) m/s', data)
+            if reg:
+                self.wind_max = reg.group(1)
+#                print >>sys.stderr, "wind_max: ", self.wind_max
+                self.inwind = 1
+
+        if self.inwind == 4:
+            reg = re.search('\(([0-9]+)$', data)
+            if reg:
+                self.wind_dir = reg.group(1)
+#                print >>sys.stderr, "wind_dir: ", self.wind_dir
+                self.inwind = 1
+
+        if self.inwind == 1 and data == "Tuulen suunta ":
+            self.inwind = 4
+
+        if self.inwind == 1 and data.startswith("Keskituuli t"):
+            self.inwind = 3
+
+        if self.inwind == 1 and data == "Tuulen nopeus ":
+            self.inwind = 2
+
+        if self.inwindBox and data == "Tuuli":
+            self.inwind = 1
+            
+        if self.intime == 2:
+            reg = re.search(' ([0-9]+:[0-9]+)', data)
             if reg:
                 self.time = reg.group(1)
+#                print >>sys.stderr, "time: ", self.time
+                self.intime = 0
+
+        if self.intime == 1 and data == "klo":
+            self.intime = 2
+
+        if data.startswith("Pivitetty"):
+            self.intime = 1
+
+        # if self.intable and self.intd:
+        #     if self.text.startswith(" Lmptila"):
+        #         self.intemp = True
+        #     if self.text.startswith(" Tuuli"):
+        #         self.intuuli = True
+        #     if self.text.startswith(" Keskituuli t") and self.intuuli:
+        #         self.found = True
+        #         reg = re.search('([0-9]+\.[0-9]+) m/s', self.text)
+        #         if reg:
+        #             self.wind_speed = reg.group(1)
+        #     if self.text.startswith(" Tuulen nopeus") and self.intuuli:
+        #         reg = re.search('([0-9]+\.[0-9]+) m/s', self.text)
+        #         if reg:
+        #             self.wind_max = reg.group(1)
+        #     if self.text.startswith(" Tuulen suunta") and self.intuuli:
+        #         reg = re.search('10min.* \(([0-9]+)', self.text)
+        #         if reg:
+        #             self.wind_dir = reg.group(1)
+        #     if self.text.startswith(" T ll  hetkell") and self.intemp:
+        #         reg = re.search(' ([\-0-9]+\.[0-9])', self.text)
+        #         if reg:
+        #             self.temp = reg.group(1)
+        # if self.text.startswith(" P ivittynyt viimeksi:") and self.inspan:
+        #     reg = re.search(' ([0-9]+:[0-9]+)', self.text)
+        #     if reg:
+        #         self.time = reg.group(1)
                 
 
 #page = getUrl(yyteriUrl)
