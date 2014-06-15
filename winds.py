@@ -440,9 +440,9 @@ class SaapalveluParser(HTMLParser):
         self.text = self.text + " " + data
 
         if self.intemp == 2:
-            reg = re.search('([\-0-9]+\.*[0-9]*)', data)
+            reg = re.search('([\-0-9]+[,\.]*[0-9]*)', data)
             if reg:
-                self.temp = reg.group(1)
+                self.temp = reg.group(1).replace(",", ".")
                 self.intemp = 0
 #                print >>sys.stderr, "temp: ", self.temp
 
@@ -455,17 +455,17 @@ class SaapalveluParser(HTMLParser):
 #            print >>sys.stderr, data
 
         if self.inwind == 2:
-            reg = re.search('([0-9]+\.*[0-9]*) m/s', data)
+            reg = re.search('([0-9]+[,\.]*[0-9]*) m/s', data)
             if reg:
-                self.wind_speed = reg.group(1)
+                self.wind_speed = reg.group(1).replace(",", ".")
 #                print >>sys.stderr, "wind_speed: ", self.wind_speed
                 self.inwind = 1
                 self.found = True
 
         if self.inwind == 3:
-            reg = re.search('([0-9]+\.*[0-9]*) m/s', data)
+            reg = re.search('([0-9]+[,\.]*[0-9]*) m/s', data)
             if reg:
-                self.wind_max = reg.group(1)
+                self.wind_max = reg.group(1).replace(",", ".")
 #                print >>sys.stderr, "wind_max: ", self.wind_max
                 self.inwind = 1
 
