@@ -10,11 +10,13 @@ import re
 import os
 import sys
 import fetch_data_lib
+import math
 
 tm = time.time()
 time=time.localtime(tm)
 hour=time.tm_hour
 minute=time.tm_min
+ms_to_knts = (3.6 / 1.852)
 
 entityChars = {"auml" : "ä", "ouml" : "ö", "aring" : "å", "nbsp" : " ", "Auml" : "Ä", "Ouml" : "Ö", "Aring" : "å"}
 
@@ -61,8 +63,9 @@ else:
              ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
              ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
-             ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("FmiBeta", "Hel.Majakka", "101003"),
+             ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
+             ("Windguru", "Laru", "47", '', 'self.wind_speed>=5 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>=5 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>=6 and self.wind_dir>=180+10 and self.wind_dir<=240+10'), # 10 deg off at the moment
 #             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
@@ -84,21 +87,25 @@ else:
 #             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
 #             ("FmiBeta", "Harmaja", "100996"),
 #             ("FmiBeta", "Tulliniemi", "100946"),
+#             ("Windguru", "laru", "47"),
 #             ]
 
 spots = [ 
     ('Laru', 
      (  # one star condition
          ('Harmaja', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
-         ('eira', 'self.wind_max>=6 and self.wind_dir>=180+10 and self.wind_dir<=240+10') # seems 10 deg off
+         ('laru', 'self.wind_speed>=5 and self.wind_dir>=180 and self.wind_dir<=240')
+#         ('eira', 'self.wind_max>=6 and self.wind_dir>=180+10 and self.wind_dir<=240+10') # seems 10 deg off
      ),
      (  # two star condition
          ('Harmaja', 'self.wind_speed>=8 and self.wind_dir>=185 and self.wind_dir<=235'),
-         ('eira', 'self.wind_max>=7 and self.wind_dir>=185+10 and self.wind_dir<=235+10')
+         ('laru', 'self.wind_speed>=7 and self.wind_dir>=185 and self.wind_dir<=235')
+#         ('eira', 'self.wind_max>=7 and self.wind_dir>=185+10 and self.wind_dir<=235+10')
      ),
      (  # three star condition
          ('Harmaja', 'self.wind_speed>=10 and self.wind_dir>=186 and self.wind_dir<=220'),
-         ('eira', 'self.wind_max>=8 and self.wind_dir>=186+10 and self.wind_dir<=220+10')
+         ('laru', 'self.wind_speed>=8 and self.wind_dir>=186 and self.wind_dir<=220')
+#         ('eira', 'self.wind_max>=8 and self.wind_dir>=186+10 and self.wind_dir<=220+10')
      )
  ),
     ('Kallvik', 
@@ -195,12 +202,26 @@ ilmlurl = "http://ilmatieteenlaitos.fi/suomen-havainnot?p_p_id=stationstatusport
 remlog = "http://www.remlog.com/cgi/tplast.pl?node="
 yyteriUrl="http://www.purjelautaliitto.fi/yyteriweather/"
 saapalveluUrl="http://www.saapalvelu.fi"
+windguruInfoUrl='http://station.windguru.cz/?id='
+windguruApiUrl='https://www.windguru.cz/int/iapi.php?callback=?&q=station_data_current&id_station='
+
+#ret={"wind_avg":2.72,"wind_max":4.85,"wind_min":1.16,"wind_direction":168.1,"temperature":15.1,"mslp":0,"rh":0,"datetime":"2014-06-28 20:31:35 EEST","unixtime":1403976695,"error_details":""}
+#print ret
+#exit()
 
 def getUrl(url):
     f = urllib.urlopen(url)
     res = f.read()
     f.close()
     return res
+
+#guruData = getUrl(windguruUrl + "&q=station_data_current&id_station=47")
+#evalThis = guruData[2:len(guruData)-2].replace("null", "0")
+#ret=eval(evalThis)
+#print ret
+#print "wind max", float(ret["wind_max"])/ms_to_knts
+#exit()
+
 
 oldLimitMin = 100
 
@@ -716,6 +737,24 @@ class FmiBetaGather(DataGather):
             self.wind_max = float(self.observations[2][last])
             self.temp = float(self.observations[3][last])
 
+class WindguruGather(DataGather):
+
+    def __init__(self, initData):
+        self.station = initData[2]
+        super(WindguruGather, self).__init__(initData, windguruInfoUrl + initData[2])
+
+    def doGather(self):
+        self.observationJson = getUrl(windguruApiUrl + self.station)
+        self.observation = eval(self.observationJson[2:len(self.observationJson)-2].replace("null", "0"))
+        if len(self.observation) > 0:
+            self.found = True
+            self.wind_speed = round(float(self.observation["wind_avg"])/ms_to_knts,1)
+            self.wind_max = round(float(self.observation["wind_max"])/ms_to_knts,1)
+            self.wind_dir = round(float(self.observation["wind_direction"]),1)
+            self.temp = float(self.observation["temperature"])
+            tmp = self.observation["datetime"].split(' ')[1].split(':')
+            self.time = tmp[0] + ":" + tmp[1]
+
 def nameToVar(a):
     return a.replace('å', 'a').replace('ä', 'a').replace('ö', 'o').replace('Å', 'A').replace('Ä', 'A').replace('Ö', 'O').replace('.', '')
 
@@ -933,8 +972,7 @@ for i, spot in zip(range(len(spots)), spots):
         print '</tr>'
         odd = 1 - odd
 print '	</table>'
-
-print '<br/>'
+print '<a href="http://station.windguru.cz/?id=47">Laru asema</a><br/>'
 print '<br/><a href="forecasts.html">Ennusteet</a><br/><br/>'
 print '<a href="http://testbed.fmi.fi/history_browser.php?imgtype=wind&t=15&n=1">Testbed</a><br/><br/>'
 print '<a href="winds_ee.html">Eesti asemat</a><br/><br/>'
