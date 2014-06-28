@@ -972,7 +972,6 @@ for i, spot in zip(range(len(spots)), spots):
         print '</tr>'
         odd = 1 - odd
 print '	</table>'
-print '<a href="http://station.windguru.cz/?id=47">Laru asema</a><br/>'
 print '<br/><a href="forecasts.html">Ennusteet</a><br/><br/>'
 print '<a href="http://testbed.fmi.fi/history_browser.php?imgtype=wind&t=15&n=1">Testbed</a><br/><br/>'
 print '<a href="winds_ee.html">Eesti asemat</a><br/><br/>'
