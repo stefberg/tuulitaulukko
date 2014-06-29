@@ -750,6 +750,7 @@ class WindguruGather(DataGather):
             self.found = True
             self.wind_speed = round(float(self.observation["wind_avg"])/ms_to_knts,1)
             self.wind_max = round(float(self.observation["wind_max"])/ms_to_knts,1)
+            self.wind_low = round(float(self.observation["wind_min"])/ms_to_knts,1)
             self.wind_dir = round(float(self.observation["wind_direction"]),1)
             self.temp = float(self.observation["temperature"])
             tmp = self.observation["datetime"].split(' ')[1].split(':')
