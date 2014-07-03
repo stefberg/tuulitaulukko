@@ -105,7 +105,7 @@ spots = [
      (  # three star condition
          ('Harmaja', 'self.wind_speed>=10 and self.wind_dir>=186 and self.wind_dir<=220'),
          ('Laru', 'self.wind_speed>=8 and self.wind_dir>=186 and self.wind_dir<=220')
-#         ('eira', 'self.wind_max>=8 and self.wind_dir>=186+10 and self.wind_dir<=220+10')
+         ('eira', 'self.wind_max>=8 and self.wind_dir>=186+10 and self.wind_dir<=220+10')
      )
  ),
     ('Kallvik', 
