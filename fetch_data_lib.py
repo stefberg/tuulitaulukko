@@ -98,7 +98,7 @@ def parseData(page):
         dom = xml.dom.minidom.parseString(page)
     except:
         print >> sys.stderr, page
-        sys.exit()
+        return []
     #print page
     members = dom.getElementsByTagName("wfs:member")
     observationsArray = []
