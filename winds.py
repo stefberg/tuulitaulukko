@@ -60,8 +60,8 @@ else:
              ("FmiBeta", "Emäsalo", "101023"),
              ("FmiBeta", "Kalbådagrund", "101022"),
 #             ("Remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
-             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
-             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
+#             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
+#             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Hel.Majakka", "101003"),
              ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
@@ -615,9 +615,14 @@ class DataGather(object):
             return False
         hr = int(hm[0])
         min = int(hm[1])
+        old = False
         if hour >= hr:
-            return hour * 60 + minute - (hr * 60 + min) > oldLimitMin
-        return 24*60 - hour * 60 + minute + (hr * 60 + min) > oldLimitMin    
+            old = hour * 60 + minute - (hr * 60 + min) > oldLimitMin
+        else:
+            old = 24*60 - hour * 60 + minute + (hr * 60 + min) > oldLimitMin    
+        if old:
+            print >>sys.stderr, "old time: ", "hour", hour, "minute", minute, "station hour", hr, "station min", min, "limit", oldLimitMin
+        return old
 
 class YyteriGather(DataGather):
 
@@ -976,7 +981,7 @@ print '	</table>'
 print '<br/><a href="forecasts.html">Ennusteet</a><br/><br/>'
 print '<a href="http://testbed.fmi.fi/history_browser.php?imgtype=wind&t=15&n=1">Testbed</a><br/><br/>'
 print '<a href="winds_ee.html">Eesti asemat</a><br/><br/>'
-print 'Data <a href="http://ilmatieteenlaitos.fi/avoin-data">Ilmatieteen laitos</a>', str(datetime.datetime.now())
+print 'Data <a href="http://ilmatieteenlaitos.fi/avoin-data">Ilmatieteen laitos</a><br/>', str(datetime.datetime.now())
 print ' </html>'
 #dir = 'ttt/'
 if os.uname()[1] == 'kopsu.com':
