@@ -340,7 +340,6 @@ class RemlogParser(HTMLParser):
     def handle_endtag(self, tag):
         if tag == "body" and self.havainto:
             self.havainto = False
-#            print self.text
             reg = re.search('([0-9]+:[0-9]+)[ \t]*Dir: *([0-9]+)[ \t]*Low: *([0-9]+\.[0-9]+)[ \t]*Avg: *([0-9]+\.[0-9]+).*High: *([0-9]+\.[0-9]+).*Temp: *([0-9]+\.[0-9]+)', self.text)
             if reg:
                 self.time  = reg.group(1)
