@@ -1,0 +1,1 @@
+Kerää tuulidataa eri lähteistä yhteen taulukkoon ja näytä tilastoja
