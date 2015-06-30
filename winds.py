@@ -160,7 +160,7 @@ spots = [
  ),
     ('4TT', 
      ( # one star condition
-         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=160 and self.wind_dir<=240'),
+         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=160 and self.wind_dir<=250'),
      ),
      ( # two star condition
          ('Tulliniemi', 'self.wind_speed>=10 and self.wind_dir>=160 and self.wind_dir<=240'),
