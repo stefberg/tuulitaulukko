@@ -719,6 +719,12 @@ class BwGather(DataGather):
             self.wind_max = float(self.parser.wind_max)
             self.temp = float(self.parser.temp)
 
+def myfloat(str):
+    try:
+        return float(str)
+    except:
+        return 'na'
+
 class FmiBetaGather(DataGather):
 
     def __init__(self, initData):
@@ -736,10 +742,10 @@ class FmiBetaGather(DataGather):
             self.found = True
             tm = self.observations[0][last-1].split(',')
             self.time = tm[len(tm)-1]
-            self.wind_dir = float(self.observations[0][last])
-            self.wind_speed = float(self.observations[1][last])
-            self.wind_max = float(self.observations[2][last])
-            self.temp = float(self.observations[3][last])
+            self.wind_dir = myfloat(self.observations[0][last])
+            self.wind_speed = myfloat(self.observations[1][last])
+            self.wind_max = myfloat(self.observations[2][last])
+            self.temp = myfloat(self.observations[3][last])
 
 class WindguruGather(DataGather):
 
