@@ -353,7 +353,7 @@ function calcRange()
         dataMinX = data[i][DF_MINUTE];
       }
     }
-    if (dataMinY > 0) {
+    if (dataMinY >= 0) {
       dataMinY = 0;
     } else {
       dataMinY = Math.floor(dataMinY-2)
