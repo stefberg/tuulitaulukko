@@ -619,8 +619,8 @@ class DataGather(object):
             old = hour * 60 + minute - (hr * 60 + min) > oldLimitMin
         else:
             old = 24*60 - hour * 60 + minute + (hr * 60 + min) > oldLimitMin    
-        if old:
-            print >>sys.stderr, "old time: ", "hour", hour, "minute", minute, "station hour", hr, "station min", min, "limit", oldLimitMin
+#        if old:
+#            print >>sys.stderr, "old time: ", "hour", hour, "minute", minute, "station hour", hr, "station min", min, "limit", oldLimitMin
         return old
 
 class YyteriGather(DataGather):
