@@ -65,7 +65,9 @@ else:
              ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Hel.Majakka", "101003"),
              ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
-             ("Windguru", "Laru", "47", '', 'self.wind_speed>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
+             ("Windguru", "Laru", "id_station=47&password=contribyte", '', 'self.wind_speed>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
+#?({"return":"error","message":"Unauthorized API access!"});
+
              ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>=6 and self.wind_dir>=180+10 and self.wind_dir<=240+10'), # 10 deg off at the moment
 #             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
@@ -87,7 +89,7 @@ else:
 #             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
 #             ("FmiBeta", "Harmaja", "100996"),
 #             ("FmiBeta", "Tulliniemi", "100946"),
-#             ("Windguru", "laru", "47"),
+#             ("Windguru", "laru", "id_station=47&password=contribyte"),
 #             ]
 
 spots = [ 
@@ -203,8 +205,7 @@ remlog = "http://www.remlog.com/cgi/tplast.pl?node="
 yyteriUrl="http://www.purjelautaliitto.fi/yyteriweather/"
 saapalveluUrl="http://www.saapalvelu.fi"
 windguruInfoUrl='http://station.windguru.cz/?id='
-windguruApiUrl='https://www.windguru.cz/int/iapi.php?callback=?&q=station_data_current&id_station='
-
+windguruApiUrl='https://www.windguru.cz/int/wgsapi.php?q=station_data_current&'
 #ret={"wind_avg":2.72,"wind_max":4.85,"wind_min":1.16,"wind_direction":168.1,"temperature":15.1,"mslp":0,"rh":0,"datetime":"2014-06-28 20:31:35 EEST","unixtime":1403976695,"error_details":""}
 #print ret
 #exit()
@@ -755,7 +756,8 @@ class WindguruGather(DataGather):
 
     def doGather(self):
         self.observationJson = getUrl(windguruApiUrl + self.station)
-        self.observation = eval(self.observationJson[2:len(self.observationJson)-2].replace("null", "0"))
+#        print >>sys.stderr, self.observationJson
+        self.observation = eval(self.observationJson.replace("null", "0"))
         if len(self.observation) > 0:
             self.found = True
             self.wind_speed = round(float(self.observation["wind_avg"])/ms_to_knts,1)
