@@ -204,7 +204,7 @@ ilmlurl = "http://ilmatieteenlaitos.fi/suomen-havainnot?p_p_id=stationstatusport
 remlog = "http://www.remlog.com/cgi/tplast.pl?node="
 yyteriUrl="http://www.purjelautaliitto.fi/yyteriweather/"
 saapalveluUrl="http://www.saapalvelu.fi"
-windguruInfoUrl='http://station.windguru.cz/?id='
+windguruInfoUrl='https://beta.windguru.cz/station/47'
 windguruApiUrl='https://www.windguru.cz/int/wgsapi.php?q=station_data_current&'
 #ret={"wind_avg":2.72,"wind_max":4.85,"wind_min":1.16,"wind_direction":168.1,"temperature":15.1,"mslp":0,"rh":0,"datetime":"2014-06-28 20:31:35 EEST","unixtime":1403976695,"error_details":""}
 #print ret
@@ -752,7 +752,7 @@ class WindguruGather(DataGather):
 
     def __init__(self, initData):
         self.station = initData[2]
-        super(WindguruGather, self).__init__(initData, windguruInfoUrl + initData[2])
+        super(WindguruGather, self).__init__(initData, windguruInfoUrl)
 
     def doGather(self):
         self.observationJson = getUrl(windguruApiUrl + self.station)
