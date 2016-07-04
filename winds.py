@@ -44,6 +44,7 @@ if os.uname()[1] == 'XXXX': # old station list kept here for a while
              ("ilml", "Jussarö", "station=2757&place=Raasepori"),
 #             ("remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
 #             ("fmibeta", "Tulliniemi", "100946"),
+             ("omasaa", "mulan", "/mulan/"),
              ("ilml", "Tulliniemi", "station=2746&place=Hanko"),
 #             ("ilml", "Russarö", "station=2982&place=Hanko"),
 #             ("ilml", "Isokari", "station=2964&place=Kustavi"),
@@ -73,6 +74,7 @@ else:
 #             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("FmiBeta", "Bågaskär", "100969"),
              ("FmiBeta", "Jussarö", "100965"),
+             ("Omasaa", "mulan", "/mulan/", '', 'self.wind_speed>=6 and self.wind_dir>=78 or self.wind_dir<=20'),
 #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
              ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=78 and self.wind_dir<=205'),
              ("FmiBeta", "Russarö", "100932"),
@@ -84,8 +86,10 @@ else:
              ("FmiBeta", "Vihreäsaari", "101794"),
              ]
 
-#stations = [ ("Ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
+#stations = [
+    #("Ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
 #             ("Saapalvelu", "koivusaari", "/helsinki/index.php"),
+#             ("Omasaa", "mulan", "/mulan/", '', 'self.wind_speed>=6 and self.wind_dir>=78 or self.wind_dir<=20'),
 #             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
 #             ("FmiBeta", "Harmaja", "100996"),
 #             ("FmiBeta", "Tulliniemi", "100946"),
@@ -200,10 +204,13 @@ spots = [
  ),
 ]
 
+#spots = []
+
 ilmlurl = "http://ilmatieteenlaitos.fi/suomen-havainnot?p_p_id=stationstatusportlet_WAR_fmiwwwweatherportlets&p_r_p_1689542720_parameter=21&"
 remlog = "http://www.remlog.com/cgi/tplast.pl?node="
 yyteriUrl="http://www.purjelautaliitto.fi/yyteriweather/"
 saapalveluUrl="http://www.saapalvelu.fi"
+omasaaUrl="http://www.omasaa.fi"
 windguruInfoUrl='https://beta.windguru.cz/station/47'
 windguruApiUrl='https://www.windguru.cz/int/wgsapi.php?q=station_data_current&'
 #ret={"wind_avg":2.72,"wind_max":4.85,"wind_min":1.16,"wind_direction":168.1,"temperature":15.1,"mslp":0,"rh":0,"datetime":"2014-06-28 20:31:35 EEST","unixtime":1403976695,"error_details":""}
@@ -559,6 +566,56 @@ class SaapalveluParser(HTMLParser):
 #print parser.wind_max
 #exit()
 
+class OmasaaParser(HTMLParser):
+    
+    def __init__(self, info_url):
+        HTMLParser.__init__(self)
+        self.table = []
+        self.time = 0
+        self.wind_dir = 0
+        self.wind_speed = 0
+        self.wind_low = 0
+        self.wind_max = 0
+        self.temp = 'na'
+        self.info_url = info_url
+        self.found = False
+        self.intemp = False
+        self.inwind = False
+        self.inwinddir = False
+        self.intime = 0
+        self.text = ""
+
+    def handle_starttag(self, tag, attrs):
+        self.text = ''
+        if tag == "span":
+            if len(attrs) > 0 and attrs[0][0] == 'id' and attrs[0][1] == 'wind_force66':
+                self.inwind = True
+            if len(attrs) > 0 and attrs[0][0] == 'id' and attrs[0][1] == 'wdir_166':
+                self.inwinddir = True
+            if len(attrs) > 0 and attrs[0][0] == 'id' and attrs[0][1] == 'temp66':
+                self.intemp = True
+            if len(attrs) > 0 and attrs[0][0] == 'id' and attrs[0][1] == 'time66':
+                self.intime = True
+
+    def handle_endtag(self, tag):
+        if tag == "span":
+            self.inwind = False
+            self.intemp = False
+            self.inwinddir = False
+            self.intime = False
+
+    def handle_data(self, data):
+        self.text = self.text + " " + data
+        if self.inwind:
+            self.wind_speed = float(self.text)
+            self.found = True
+        if self.inwinddir:
+            self.wind_dir = float(self.text)
+        if self.intemp:
+            self.temp = float(self.text)
+        if self.intime:
+            self.time = self.text
+
 #23:45  Dir: 225 ^ 225  Low:  1.0 -  1.8  Avg:  2.1  High:  2.4 -  3.0   10.8?C
 class bwParser:
 
@@ -692,6 +749,25 @@ class SaapalveluGather(DataGather):
         self.page = getUrl(self.page_url)
         self.parser = SaapalveluParser(self.page_url)
         self.page = self.page.replace('sc\'+\'ript', 'script')
+        self.parser.feed(onlyAscii(self.page))
+        if self.parser.found:
+            self.found = True
+            self.time = self.parser.time
+            self.wind_dir = float(self.parser.wind_dir)
+            self.wind_low = float(self.parser.wind_low)
+            self.wind_speed = float(self.parser.wind_speed)
+            self.wind_max = float(self.parser.wind_max)
+            self.temp = float(self.parser.temp)
+
+class OmasaaGather(DataGather):
+
+    def __init__(self, initData):
+        self.page_url = omasaaUrl + initData[2]
+        super(OmasaaGather, self).__init__(initData, omasaaUrl + initData[2])
+
+    def doGather(self):
+        self.page = getUrl(self.page_url)
+        self.parser = OmasaaParser(self.page_url)
         self.parser.feed(onlyAscii(self.page))
         if self.parser.found:
             self.found = True
@@ -991,9 +1067,10 @@ print '<a href="winds_ee.html">Eesti asemat</a><br/><br/>'
 print 'Data <a href="http://ilmatieteenlaitos.fi/avoin-data">Ilmatieteen laitos</a><br/>', str(datetime.datetime.now())
 print ' </html>'
 #dir = 'ttt/'
+
 if os.uname()[1] == 'kopsu.com':
     dir = '/home/webadmin/kopsu.com/html/wind_data/'
-elif os.uname()[1] == 'Macintosh.local':
+elif os.uname()[1] == 'Macintosh.local' or os.uname()[1] == 'Taru-MacBook-Pro-4.local':
     dir = './wind_data/'
 else:
     dir = '/hsphere/local/home/saberg/dlarah.org/wind_data/'
