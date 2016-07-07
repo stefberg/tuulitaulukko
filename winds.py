@@ -608,6 +608,7 @@ class OmasaaParser(HTMLParser):
         self.text = self.text + " " + data
         if self.inwind:
             self.wind_speed = float(self.text)
+            self.wind_max = self.wind_speed
             self.found = True
         if self.inwinddir:
             self.wind_dir = float(self.text)
@@ -964,7 +965,7 @@ print '    <td>'
 print '    <table id="wind_table" class="lboardsnip" cellpadding="0" cellspacing="0">'
 print '      <tbody>'
 print '	<tr class="head">'
-print '	  <th colspan="6"'
+print '	  <th colspan="7"'
 print '	      style="padding-left: 4px;" align="left">'
 print '	    <div style="margin-top: 4px;">Tuulet (historiakäyrät klikkaamalla arvoja!)</div>'
 print '	  </th>'
@@ -976,6 +977,7 @@ print '	  <td ><b>Aika</b></td>'
 print '	  <td ><b>Suunta</b></td>'
 print '	  <td ><b>Keski</b></td>'
 print '	  <td ><b>Max</b></td>'
+print '	  <td ><b>g%</b></td>'
 print '	  <td ><b>T</b></td>'
 print '	</tr>'
 
@@ -999,6 +1001,7 @@ for l in list:
     print '	  <td><a href="javascript:showStation(\'' + l.name + '\', 2)">' + str(l.wind_dir) + '</a></td>'
     print '	  <td><a href="javascript:showStation(\'' + l.name + '\', 0)">' + str(l.wind_speed) + '</a></td>'
     print '	  <td><a href="javascript:showStation(\'' + l.name + '\', 0)">' + str(l.wind_max) + '</a></td>'
+    print '	  <td>'+ str(int((l.wind_max - l.wind_speed) / l.wind_speed * 100)) + '</td>'
     print '	  <td><a href="javascript:showStation(\'' + l.name + '\', 1)">' + str(l.temp) + '&deg;</a></td>'
     print '	</tr>'
 
