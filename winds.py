@@ -74,7 +74,7 @@ else:
 #             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("FmiBeta", "Bågaskär", "100969"),
              ("FmiBeta", "Jussarö", "100965"),
-             ("Omasaa", "mulan", "/mulan/", '', 'self.wind_speed>=6 and self.wind_dir>=78 or self.wind_dir<=20'),
+             ("Omasaa", "mulan", "/mulan/", '', 'self.wind_speed>=7 and self.wind_dir>=78 or self.wind_dir<=20'),
 #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
              ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=78 and self.wind_dir<=205'),
              ("FmiBeta", "Russarö", "100932"),
