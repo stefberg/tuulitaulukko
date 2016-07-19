@@ -5,6 +5,7 @@ import time
 import datetime
 import urllib
 import string
+import traceback
 from HTMLParser import HTMLParser
 import re
 import os
@@ -892,6 +893,7 @@ for v in stations:
             S[nameToVar(gatherer.name)] = nullStation
     except IOError:
         print "IOError on ", v[1]
+        traceback.print_exc(file=sys.stderr)
 
 # test data
 # S["Harmaja"].wind_speed = 11
@@ -1069,6 +1071,7 @@ for i, spot in zip(range(len(spots)), spots):
 print '	</table>'
 print '<br/><a href="forecasts.html">Ennusteet</a><br/><br/>'
 print '<a href="http://testbed.fmi.fi/history_browser.php?imgtype=wind&t=15&n=1">Testbed</a><br/><br/>'
+print '<a href="http://ilmatieteenlaitos.fi/sade-ja-pilvialueet/suomen-etelaosa">Sadetutka</a><br/><br/>'
 print '<a href="winds_ee.html">Eesti asemat</a><br/><br/>'
 print 'Data <a href="http://ilmatieteenlaitos.fi/avoin-data">Ilmatieteen laitos</a><br/>', str(datetime.datetime.now())
 print ' </html>'

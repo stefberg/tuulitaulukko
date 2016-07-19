@@ -34,7 +34,7 @@ def getApiKey():
     if not apikey:
         if os.uname()[1] == 'kopsu.com':
             dir = '/home/webadmin/kopsu.com/winds/'
-        elif os.uname()[1] == 'Macintosh.local':
+        elif os.uname()[1] == 'Macintosh.local' or os.uname()[1] == 'Taru-MacBook-Pro-4.local':
             dir = './'
         else:
             dir = '/hsphere/local/home/saberg/winds/'
