@@ -52,6 +52,7 @@ def getUrl(url):
     f = urllib.urlopen(url)
     res = f.read()
     f.close()
+#    print res
     return res
 
 def getText(node):
@@ -68,7 +69,7 @@ def getMeasurements(station, starttime, endtime, timestep, param):
 
 def getMeasurementsDuration(station, duration, param):
     if duration == 0:
-        duration = (20.0*60)/24.0/3600 # 20 mins in fraction of days
+        duration = (60.0*60)/24.0/3600 # 60 mins in fraction of days
     starttime = getTime(duration);
     endtime = getTime(0)
     timestep = 10

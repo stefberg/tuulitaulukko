@@ -814,7 +814,7 @@ class FmiBetaGather(DataGather):
         self.observations = fetch_data_lib.fetchDataNumDays(self.station, 0, 'winddirection,windspeedms,windgust,temperature')
         if len(self.observations) > 0:
             last = len(self.observations[0]) - 1
-            if self.observations[0][last].lower() == "nan":
+            while self.observations[0][last].lower() == "nan" and last-1 > 0:
                 last = last - 2
             if last-1 < 0:
                 return
