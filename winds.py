@@ -70,7 +70,7 @@ else:
              ("Windguru", "Laru", "id_station=47&password=contribyte", '', 'self.wind_speed>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
 #?({"return":"error","message":"Unauthorized API access!"});
 
-             ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
+#             ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>=6 and self.wind_dir>=180+10 and self.wind_dir<=240+10'), # 10 deg off at the moment
 #             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("FmiBeta", "Bågaskär", "100969"),
