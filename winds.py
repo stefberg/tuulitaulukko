@@ -3,6 +3,7 @@
 
 import time
 import datetime
+from datetime import timedelta
 import urllib
 import string
 import traceback
@@ -63,7 +64,7 @@ else:
              ("FmiBeta", "Kalbådagrund", "101022"),
 #             ("Remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
 #             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
-#             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
+             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Hel.Majakka", "101003"),
              ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
@@ -79,6 +80,9 @@ else:
 #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
              ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=78 and self.wind_dir<=205'),
              ("FmiBeta", "Russarö", "100932"),
+             ("Holfuy", "Bergön", "k=s114", '', ''),
+             ("FmiBeta", "Vänö", "100945"),
+             ("FmiBeta", "Utö", "100908"),
 #             ("Yyteri", "yyteri", "http://www.purjelautaliitto.fi/yyteriweather/", '', 'self.wind_speed>=5 and self.wind_dir>=170 and self.wind_dir<=315'),
              ("FmiBeta", "Tahkoluoto", "101267", '', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315'),
              ("FmiBeta", "Tankar", "101661"),
@@ -214,6 +218,8 @@ saapalveluUrl="http://www.saapalvelu.fi"
 omasaaUrl="http://www.omasaa.fi"
 windguruInfoUrl='https://beta.windguru.cz/station/47'
 windguruApiUrl='https://www.windguru.cz/int/wgsapi.php?q=station_data_current&'
+holfuyApiUrl="http://holfuy.com/en/modules/mjso.php?"
+holfuyInfoUrl="http://holfuy.com/en/data/114"
 #ret={"wind_avg":2.72,"wind_max":4.85,"wind_min":1.16,"wind_direction":168.1,"temperature":15.1,"mslp":0,"rh":0,"datetime":"2014-06-28 20:31:35 EEST","unixtime":1403976695,"error_details":""}
 #print ret
 #exit()
@@ -845,6 +851,26 @@ class WindguruGather(DataGather):
             self.temp = float(self.observation["temperature"])
             tmp = self.observation["datetime"].split(' ')[1].split(':')
             self.time = tmp[0] + ":" + tmp[1]
+
+class HolfuyGather(DataGather):
+
+    def __init__(self, initData):
+        self.station = initData[2]
+        super(HolfuyGather, self).__init__(initData, holfuyInfoUrl)
+
+    def doGather(self):
+        self.observationJson = getUrl(holfuyApiUrl + self.station)
+#        print >>sys.stderr, self.observationJson
+        self.observation = eval(self.observationJson.replace("\n", " "))
+        if len(self.observation) > 0:
+            self.found = True
+            self.wind_speed = round(float(self.observation["speed"]),1)
+            self.wind_max = round(float(self.observation["gust"]),1)
+            self.wind_dir = round(float(self.observation["dir"]),1)
+            self.temp = float(self.observation["temperature"])
+            tmp = int(self.observation["updated"].split(' ')[0].replace("<b>", "").replace("</b>", ""))
+            tm = datetime.datetime.now() - timedelta(seconds=tmp)
+            self.time = str(tm.hour) + ":" + str(tm.minute)
 
 def nameToVar(a):
     return a.replace('å', 'a').replace('ä', 'a').replace('ö', 'o').replace('Å', 'A').replace('Ä', 'A').replace('Ö', 'O').replace('.', '')
