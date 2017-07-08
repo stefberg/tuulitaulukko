@@ -918,7 +918,6 @@ for v in stations:
         else:
             S[nameToVar(gatherer.name)] = nullStation
     except IOError:
-        print "IOError on ", v[1]
         traceback.print_exc(file=sys.stderr)
 
 # test data
