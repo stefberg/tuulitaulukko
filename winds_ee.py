@@ -2,21 +2,25 @@
 # -*- coding: utf-8 -*-
 
 import xml.dom.minidom
-import urllib
+import urllib2
 import time
 import os
 import sys
 
-url = 'http://www.emhi.ee/ilma_andmed/xml/observations.php'
+url = 'http://www.ilmateenistus.ee/ilma_andmed/xml/observations.php'
 infoUrl = 'http://www.emhi.ee/index.php?ide=15&v_kiht=1'
 codes = ["86093", "86094", "26120", "26115", "26218", "26231"]
 stationsTable = {}
 
 def getUrl(url):
-    f = urllib.urlopen(url)
-    res = f.read()
-    f.close()
-    return res
+    req = urllib2.Request(
+        url, 
+        data=None, 
+        headers={
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+        }
+    )
+    return urllib2.urlopen(req).read()
 
 page = getUrl(url)
 if page.find('<?xml') != 0:
