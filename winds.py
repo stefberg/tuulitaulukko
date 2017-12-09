@@ -859,18 +859,26 @@ class HolfuyGather(DataGather):
         super(HolfuyGather, self).__init__(initData, holfuyInfoUrl)
 
     def doGather(self):
-        self.observationJson = getUrl(holfuyApiUrl + self.station)
-#        print >>sys.stderr, self.observationJson
-        self.observation = eval(self.observationJson.replace("\n", " "))
-        if len(self.observation) > 0:
-            self.found = True
-            self.wind_speed = round(float(self.observation["speed"]),1)
-            self.wind_max = round(float(self.observation["gust"]),1)
-            self.wind_dir = round(float(self.observation["dir"]),1)
-            self.temp = float(self.observation["temperature"])
-            tmp = int(self.observation["updated"].split(' ')[0].replace("<b>", "").replace("</b>", ""))
-            tm = datetime.datetime.now() - timedelta(seconds=tmp)
-            self.time = str(tm.hour) + ":" + str(tm.minute)
+        try:
+            self.observationJson = getUrl(holfuyApiUrl + self.station)
+            self.observation = eval(self.observationJson.replace("\n", " ").replace("null", "0"))
+            if len(self.observation) > 0:
+                self.found = True
+                self.wind_speed = round(float(self.observation["speed"]),1)
+                self.wind_max = round(float(self.observation["gust"]),1)
+                self.wind_dir = round(float(self.observation["dir"]),1)
+                self.temp = float(self.observation["temperature"])
+                try:
+                    tmp = int(self.observation["updated"].split(' ')[0].replace("<b>", "").replace("</b>", ""))
+                    tm = datetime.datetime.now() - timedelta(seconds=tmp)
+                    self.time = str(tm.hour) + ":" + str(tm.minute)
+                except:
+                    tm = self.observation["updated"].split(' ')[1].split(":")
+                    self.time = tm[0]+":"+tm[1]
+        except:
+            print >>sys.stderr, "Problems with data from Holfui", self.observationJson
+            traceback.print_exc(file=sys.stderr)
+            self.found = False
 
 def nameToVar(a):
     return a.replace('å', 'a').replace('ä', 'a').replace('ö', 'o').replace('Å', 'A').replace('Ä', 'A').replace('Ö', 'O').replace('.', '')
