@@ -7,8 +7,14 @@ then
     cgi_dir=/home/webadmin/kopsu.com/cgi-bin
     html_dir=/home/webadmin/kopsu.com/html
 else
-    cgi_dir=/hsphere/local/home/saberg/dlarah.org/cgi-bin
-    html_dir=/hsphere/local/home/saberg/dlarah.org
+    if uname -a | grep -q amzn
+    then
+      cgi_dir=/var/www/cgi-bin
+      html_dir=/var/www/html
+    else
+      cgi_dir=/hsphere/local/home/saberg/dlarah.org/cgi-bin
+      html_dir=/hsphere/local/home/saberg/dlarah.org
+    fi
 fi
 
 $cgi_dir/winds.py > $html_dir/winds_tmp.html
