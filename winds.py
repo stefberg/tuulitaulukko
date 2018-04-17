@@ -80,7 +80,7 @@ else:
 #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
              ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=78 and self.wind_dir<=205'),
              ("FmiBeta", "Russarö", "100932"),
-#             ("Holfuy", "Bergön", "k=s114", '', ''),
+             #("Holfuy", "Bergön", "k=s114", '', ''),
              ("FmiBeta", "Vänö", "100945"),
              ("FmiBeta", "Utö", "100908"),
 #             ("Yyteri", "yyteri", "http://www.purjelautaliitto.fi/yyteriweather/", '', 'self.wind_speed>=5 and self.wind_dir>=170 and self.wind_dir<=315'),
@@ -1114,6 +1114,8 @@ if os.uname()[1] == 'kopsu.com':
     dir = '/home/webadmin/kopsu.com/html/wind_data/'
 elif os.uname()[1] == 'Macintosh.local' or os.uname()[1] == 'Taru-MacBook-Pro-4.local':
     dir = './wind_data/'
+elif os.uname()[2].find("amzn") > 0:
+    dir = "/var/www/html/wind_data/"
 else:
     dir = '/hsphere/local/home/saberg/dlarah.org/wind_data/'
 

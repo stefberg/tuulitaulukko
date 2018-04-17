@@ -36,9 +36,13 @@ def getApiKey():
             dir = '/home/webadmin/kopsu.com/winds/'
         elif os.uname()[1] == 'Macintosh.local' or os.uname()[1] == 'Taru-MacBook-Pro-4.local':
             dir = './'
+        elif os.uname()[2].find("amzn") > 0:
+            dir = "/var/www/keys/"
         else:
             dir = '/hsphere/local/home/saberg/winds/'
         api_key_file = dir + 'fmi_api_key.txt'
+        #print os.uname()[1]
+        #print "APIKEY file", api_key_file
         f = open(api_key_file, "r")
         apikey = f.read();
         apikey = apikey.replace('\n', '')
@@ -64,7 +68,7 @@ def getText(node):
 
 def getMeasurements(station, starttime, endtime, timestep, param):
     query_url = baseurl + 'fmi-apikey/' + getApiKey() + '/wfs?' + 'request=' + request + '&storedquery_id=' + query + '&fmisid=' + station +  '&parameters=' + param + '&starttime=' + starttime + '&endtime=' + endtime + '&timestep=' + str(timestep)
-#    print >>sys.stderr, query_url
+    #print >>sys.stderr, query_url
     return getUrl(query_url)
 
 def getMeasurementsDuration(station, duration, param):

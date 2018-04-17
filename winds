@@ -2,6 +2,7 @@
 
 export TZ="Europe/Helsinki"
 
+<<<<<<< HEAD
 [ -d /home/webadmin/kopsu.com/cgi-bin ] && cgi_dir=/home/webadmin/kopsu.com/cgi-bin
 [ -d /home/webadmin/kopsu.com/html ] && html_dir=/home/webadmin/kopsu.com/html
 
@@ -11,8 +12,11 @@ export TZ="Europe/Helsinki"
 [ -d $HOME/public_html/cgi-bin ] && cgi_dir=$HOME/public_html/cgi-bin
 [ -d $HOME/public_html ] && html_dir=$HOME/public_html
 
-echo "$cgi_dir/winds.py > $html_dir/winds_tmp.html"
-exit
+if uname -a | grep -q amzn
+then
+    cgi_dir=/var/www/cgi-bin
+    html_dir=/var/www/html
+fi
 
 $cgi_dir/winds.py > $html_dir/winds_tmp.html
 
