@@ -2,14 +2,17 @@
 
 export TZ="Europe/Helsinki"
 
-if [ `hostname` = "kopsu.com" ]
-then
-    cgi_dir=/home/webadmin/kopsu.com/cgi-bin
-    html_dir=/home/webadmin/kopsu.com/html
-else
-    cgi_dir=/hsphere/local/home/saberg/dlarah.org/cgi-bin
-    html_dir=/hsphere/local/home/saberg/dlarah.org
-fi
+[ -d /home/webadmin/kopsu.com/cgi-bin ] && cgi_dir=/home/webadmin/kopsu.com/cgi-bin
+[ -d /home/webadmin/kopsu.com/html ] && html_dir=/home/webadmin/kopsu.com/html
+
+[ -d /hsphere/local/home/saberg/dlarah.org/cgi-bin ] && cgi_dir=/hsphere/local/home/saberg/dlarah.org/cgi-bin
+[ -d /hsphere/local/home/saberg/dlarah.org ] && html_dir=/hsphere/local/home/saberg/dlarah.org
+
+[ -d $HOME/public_html/cgi-bin ] && cgi_dir=$HOME/public_html/cgi-bin
+[ -d $HOME/public_html ] && html_dir=$HOME/public_html
+
+echo "$cgi_dir/winds.py > $html_dir/winds_tmp.html"
+exit
 
 $cgi_dir/winds.py > $html_dir/winds_tmp.html
 
