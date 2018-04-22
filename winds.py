@@ -66,6 +66,7 @@ else:
 #             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
 #             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
+             ("Windguru", "Villinginluoto", "id_station=1137&password=vitsiPorkkana12", '', 'self.wind_speed>=6 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Hel.Majakka", "101003"),
              ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("Windguru", "Laru", "id_station=47&password=contribyte", '', 'self.wind_speed>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
@@ -216,7 +217,7 @@ remlog = "http://www.remlog.com/cgi/tplast.pl?node="
 yyteriUrl="http://www.purjelautaliitto.fi/yyteriweather/"
 saapalveluUrl="http://www.saapalvelu.fi"
 omasaaUrl="http://www.omasaa.fi"
-windguruInfoUrl='https://beta.windguru.cz/station/47'
+windguruInfoUrl='https://beta.windguru.cz/station/'
 windguruApiUrl='https://www.windguru.cz/int/wgsapi.php?q=station_data_current&'
 holfuyApiUrl="http://holfuy.com/en/modules/mjso.php?"
 holfuyInfoUrl="http://holfuy.com/en/data/114"
@@ -836,7 +837,8 @@ class WindguruGather(DataGather):
 
     def __init__(self, initData):
         self.station = initData[2]
-        super(WindguruGather, self).__init__(initData, windguruInfoUrl)
+        stationId = re.search('id_station=([0-9]*)', initData[2])
+        super(WindguruGather, self).__init__(initData, windguruInfoUrl + stationId.group(1))
 
     def doGather(self):
         self.observationJson = getUrl(windguruApiUrl + self.station)
