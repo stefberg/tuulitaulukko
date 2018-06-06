@@ -10,44 +10,13 @@ import re
 import datetime
 
 baseurl = 'http://data.fmi.fi/'
-apikey = ''
-#apikey = 'b37f3e99-cdb8-4858-b850-bfffea6542f9'
-request = 'getFeature'
-#query = 'fmi::observations::weather::multipointcoverage'
-query = 'fmi::observations::weather::timevaluepair'
-#query = 'fmi::observations::weather::realtime::place::timevaluepair'
-# windspeedms, temperature, winddirection
-#place = 'Harmaja'
-timestep = 1
-#starttime = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() - 30*60))
-#endtime = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+fmiApiKey = ''
 
-#query_url = baseurl + 'fmi-apikey/' + apikey + '/wfs?' + 'request=' + request + '&storedquery_id=' + query + '&place=' + place +  '&parameters=' + parameters + '&starttime=' + starttime + '&endtime=' + endtime
-#'&timestep=' + str(timestep) +
-#http://data.fmi.fi/fmi-apikey/b37f3e99-cdb8-4858-b850-bfffea6542f9/wfs?request=getFeature&storedquery_id=fmi::observations::weather::timevaluepair&place=jaala&timestep=30
-#http://data.fmi.fi/fmi-apikey/b37f3e99-cdb8-4858-b850-bfffea6542f9/wfs?request=getFeature&storedquery_idfmi::observations::weather::timevaluepair&place=Harmaja&timestep=10
+request = 'getFeature'
+query = 'fmi::observations::weather::timevaluepair'
+timestep = 1
 
 now_is_dst = time.localtime().tm_isdst
-
-def getApiKey():
-    global apikey
-    if not apikey:
-        if os.uname()[1] == 'kopsu.com':
-            dir = '/home/webadmin/kopsu.com/winds/'
-        elif os.uname()[1] == 'Macintosh.local' or os.uname()[1] == 'Taru-MacBook-Pro-4.local':
-            dir = './'
-        elif os.uname()[2].find("amzn") > 0:
-            dir = "/var/www/keys/"
-        else:
-            dir = '/hsphere/local/home/saberg/winds/'
-        api_key_file = dir + 'fmi_api_key.txt'
-        #print os.uname()[1]
-        #print "APIKEY file", api_key_file
-        f = open(api_key_file, "r")
-        apikey = f.read();
-        apikey = apikey.replace('\n', '')
-        f.close()
-    return apikey
 
 def getTime(start):
     return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() - start*24*3600))
@@ -66,12 +35,14 @@ def getText(node):
             allText = allText + text.data
     return allText.encode("utf-8")
 
-def getMeasurements(station, starttime, endtime, timestep, param):
-    query_url = baseurl + 'fmi-apikey/' + getApiKey() + '/wfs?' + 'request=' + request + '&storedquery_id=' + query + '&fmisid=' + station +  '&parameters=' + param + '&starttime=' + starttime + '&endtime=' + endtime + '&timestep=' + str(timestep)
+def getMeasurements(key, station, starttime, endtime, timestep, param):
+    global fmiApiKey
+    fmiApiKey = key
+    query_url = baseurl + 'fmi-apikey/' + fmiApiKey + '/wfs?' + 'request=' + request + '&storedquery_id=' + query + '&fmisid=' + station +  '&parameters=' + param + '&starttime=' + starttime + '&endtime=' + endtime + '&timestep=' + str(timestep)
     #print >>sys.stderr, query_url
     return getUrl(query_url)
 
-def getMeasurementsDuration(station, duration, param):
+def getMeasurementsDuration(key, station, duration, param):
     if duration == 0:
         duration = (60.0*60)/24.0/3600 # 60 mins in fraction of days
     starttime = getTime(duration);
@@ -81,7 +52,7 @@ def getMeasurementsDuration(station, duration, param):
         timestep = 30
     if duration >= 14:
         timestep = 60
-    return getMeasurements(station, starttime, endtime, timestep, param)
+    return getMeasurements(key, station, starttime, endtime, timestep, param)
 
 def formatTime(tm):
     # 2013-03-23T09:20:00Z
@@ -121,12 +92,12 @@ def parseData(page):
             observationsArray.append(measurementsArray)
     return observationsArray
 
-def fetchData(station, starttime, endtime, timestep, parameter):
-    page = getMeasurements(station, starttime, endtime, timestep, parameter)
+def fetchData(key, station, starttime, endtime, timestep, parameter):
+    page = getMeasurements(key, station, starttime, endtime, timestep, parameter)
     return parseData(page)
 
-def fetchDataNumDays(station, number_of_days, parameter):
-    page = getMeasurementsDuration(station, number_of_days, parameter)
+def fetchDataNumDays(key, station, number_of_days, parameter):
+    page = getMeasurementsDuration(key, station, number_of_days, parameter)
     return parseData(page)
 
 class Measurement:

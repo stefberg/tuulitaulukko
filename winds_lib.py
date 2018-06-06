@@ -21,6 +21,7 @@ minute=time.tm_min
 ms_to_knts = (3.6 / 1.852)
 
 entityChars = {"auml" : "ä", "ouml" : "ö", "aring" : "å", "nbsp" : " ", "Auml" : "Ä", "Ouml" : "Ö", "Aring" : "å"}
+fmiApiKey = ''
 
 if os.uname()[1] == 'XXXX': # old station list kept here for a while
     stations = [ 
@@ -818,7 +819,7 @@ class FmiBetaGather(DataGather):
         super(FmiBetaGather, self).__init__(initData, ilmlurl + 'station=' + initData[2])
 
     def doGather(self):
-        self.observations = fetch_data_lib.fetchDataNumDays(self.station, 0, 'winddirection,windspeedms,windgust,temperature')
+        self.observations = fetch_data_lib.fetchDataNumDays(fmiApiKey, self.station, 0, 'winddirection,windspeedms,windgust,temperature')
         if len(self.observations) > 0:
             last = len(self.observations[0]) - 1
             while self.observations[0][last].lower() == "nan" and last-1 > 0:
@@ -915,7 +916,10 @@ def onkoSpotillaKelia(spot, S):
             stars += 1
     return stars
 
-def gatherAllStationData():
+def gatherAllStationData(_fmiApiKey):
+    global fmiApiKey
+    fmiApiKey = _fmiApiKey
+
     S = {} # stations to use when checking wind on spots
     list = []
 
