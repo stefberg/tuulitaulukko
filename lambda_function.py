@@ -2,6 +2,7 @@ import boto3
 import urllib
 import winds_lib
 import time
+import os
 
 def getUrl(url):
     f = urllib.urlopen(url)
