@@ -9,7 +9,7 @@ def getUrl(url):
     return res
 
 def lambda_handler(event, context):
-#    windData = getUrl('http://dlarah.org/winds.html')
+    os.environ["TZ"] = "Europe/Helsinki"
     print "starting update v2"
     windData = ""
     client = boto3.client('s3')
@@ -18,6 +18,6 @@ def lambda_handler(event, context):
     (htmlCode, list) = winds_lib.gatherAllStationData(obj['Body'].read())
     for l in htmlCode:
         windData += l + "\n"
-    client.put_object(Body=windData, Bucket='windupdate', Key='winds.html', ACL='public-read', ContentType='text/html')
+    client.put_object(Body=windData, Bucket='windupdate', Key='winds.html', ACL='public-read', ContentType='text/html;charset=utf-8')
     print "update done"
     return 'Hello from Lambda'
