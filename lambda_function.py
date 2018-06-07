@@ -1,6 +1,7 @@
 import boto3 
 import urllib
 import winds_lib
+import time
 
 def getUrl(url):
     f = urllib.urlopen(url)
@@ -10,6 +11,7 @@ def getUrl(url):
 
 def lambda_handler(event, context):
     os.environ["TZ"] = "Europe/Helsinki"
+    time.tzset()
     print "starting update v2"
     windData = ""
     client = boto3.client('s3')

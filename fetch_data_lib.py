@@ -16,8 +16,6 @@ request = 'getFeature'
 query = 'fmi::observations::weather::timevaluepair'
 timestep = 1
 
-now_is_dst = time.localtime().tm_isdst
-
 def getTime(start):
     return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() - start*24*3600))
 
@@ -62,7 +60,7 @@ def formatTime(tm):
     day = reg.group(3)
     hour = reg.group(4)
     minute = reg.group(5)
-    if now_is_dst:
+    if time.localtime().tm_isdst:
         tzone = time.altzone
     else:
         tzone = time.timezone

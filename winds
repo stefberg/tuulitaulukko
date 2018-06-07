@@ -2,7 +2,6 @@
 
 export TZ="Europe/Helsinki"
 
-<<<<<<< HEAD
 [ -d /home/webadmin/kopsu.com/cgi-bin ] && cgi_dir=/home/webadmin/kopsu.com/cgi-bin
 [ -d /home/webadmin/kopsu.com/html ] && html_dir=/home/webadmin/kopsu.com/html
 

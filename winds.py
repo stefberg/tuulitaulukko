@@ -3,6 +3,7 @@
 
 import winds_lib
 import os
+import time
 
 apikey = ''
 
@@ -25,6 +26,9 @@ def getApiKey():
         apikey = apikey.replace('\n', '')
         f.close()
     return apikey
+
+os.environ["TZ"] = "Europe/Helsinki"
+time.tzset()
 
 (htmlCode, list) = winds_lib.gatherAllStationData(getApiKey())
 for l in htmlCode:
