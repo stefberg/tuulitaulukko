@@ -14,94 +14,43 @@ import sys
 import fetch_data_lib
 import math
 
-tm = time.time()
-time=time.localtime(tm)
-hour=time.tm_hour
-minute=time.tm_min
 ms_to_knts = (3.6 / 1.852)
 
 entityChars = {"auml" : "ä", "ouml" : "ö", "aring" : "å", "nbsp" : " ", "Auml" : "Ä", "Ouml" : "Ö", "Aring" : "å"}
 fmiApiKey = ''
 
-if os.uname()[1] == 'XXXX': # old station list kept here for a while
-    stations = [ 
-#             ("remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
-#             ("remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
-#             ("remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti"),
-#             ("remlog", "kalliosaari", "http://www.remlog.com/cgi/tplog.pl?node=kalliosaari"),
-#             ("ilml", "Rankki", "station=2976&place=Kotka"), 
-#             ("ilml", "Emäsalo", "station=2991&place=Porvoo"), 
-#             ("ilml", "Kalbådagrund", "station=2987&place=Porvoo"),
-#             ("fmibeta", "Eestiluoto", "101029"),
-#             ("ilml", "Eestiluoto", "station=2930&place=Helsinki"),
-#             ("ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
-#             ("fmibeta", "Harmaja", "100996"),
-             ("ilml", "Harmaja", "station=2795&place=Helsinki"),
-#             ("ilml", "Hel.Majakka", "station=2989&place=Helsinki"),
-             ("saapalvelu", "koivusaari", "/helsinki/index.php"),
-             ("bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
-             ("bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
-#             ("fmibeta", "Bågaskär", "100969"),
-             ("ilml", "Bågaskär", "station=2984&place=Inkoo"),
-#             ("fmibeta", "Jussarö", "100965"),
-             ("ilml", "Jussarö", "station=2757&place=Raasepori"),
-#             ("remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
-#             ("fmibeta", "Tulliniemi", "100946"),
-#             ("omasaa", "mulan", "/mulan/"),
-             ("ilml", "Tulliniemi", "station=2746&place=Hanko"),
-#             ("ilml", "Russarö", "station=2982&place=Hanko"),
-#             ("ilml", "Isokari", "station=2964&place=Kustavi"),
-#             ("ilml", "Rauma", "station=2761&place=Rauma"),
-#             ("yyteri", "yyteri", "http://surfkeskus.dyndns.org/saa/"),
-#             ("fmibeta", "Tahkoluoto", "101267"),
-             ("ilml", "Tahkoluoto", "station=2751&place=Pori")
-#             ("ilml", "Tankar", "station=2721&place=Kokkola"),
-#             ("ilml", "Ulkokalla", "station=2907&place=Kalajoki")
-             ]
-
-else:
-    stations = [ 
-             ("FmiBeta", "Emäsalo", "101023"),
-             ("FmiBeta", "Kalbådagrund", "101022"),
-#             ("Remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
-#             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
-#             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
+stations = [ 
+    ("FmiBeta", "Emäsalo", "101023"),
+    ("FmiBeta", "Kalbådagrund", "101022"),
+    #             ("Remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
+    #             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
+    #             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
              ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
-             ("Windguru", "Villinginluoto", "id_station=1137&password=vitsiPorkkana12", '', 'self.wind_speed>=6 and self.wind_dir>=75 and self.wind_dir<=290'),
-             ("FmiBeta", "Hel.Majakka", "101003"),
-             ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
-             ("Windguru", "Laru", "id_station=47&password=contribyte", '', 'self.wind_speed>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
-#?({"return":"error","message":"Unauthorized API access!"});
+    ("Windguru", "Villinginluoto", "id_station=1137&password=vitsiPorkkana12", '', 'self.wind_speed>=6 and self.wind_dir>=75 and self.wind_dir<=290'),
+    ("FmiBeta", "Hel.Majakka", "101003"),
+    ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
+    ("Windguru", "Laru", "id_station=47&password=contribyte", '', 'self.wind_speed>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
+    #?({"return":"error","message":"Unauthorized API access!"});
 
 #             ("Saapalvelu", "koivusaari", "/helsinki/index.php", '', 'self.wind_speed>=6 and self.wind_dir>=180 and self.wind_dir<=240'),
              ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather", 'self.wind_max>=6 and self.wind_dir>=180+10 and self.wind_dir<=240+10'), # 10 deg off at the moment
-#             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
+    #             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("FmiBeta", "Bågaskär", "100969"),
-             ("FmiBeta", "Jussarö", "100965"),
-#             ("Omasaa", "mulan", "/mulan/", '', 'self.wind_speed>=7 and ( self.wind_dir>=78 or self.wind_dir<=20 )'),
-#             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
+    ("FmiBeta", "Jussarö", "100965"),
+    #             ("Omasaa", "mulan", "/mulan/", '', 'self.wind_speed>=7 and ( self.wind_dir>=78 or self.wind_dir<=20 )'),
+    #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
              ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=78 and self.wind_dir<=205'),
-             ("FmiBeta", "Russarö", "100932"),
-             #("Holfuy", "Bergön", "k=s114", '', ''),
+    ("FmiBeta", "Russarö", "100932"),
+    #("Holfuy", "Bergön", "k=s114", '', ''),
              ("FmiBeta", "Vänö", "100945"),
-             ("FmiBeta", "Utö", "100908"),
-#             ("Yyteri", "yyteri", "http://www.purjelautaliitto.fi/yyteriweather/", '', 'self.wind_speed>=5 and self.wind_dir>=170 and self.wind_dir<=315'),
+    ("FmiBeta", "Utö", "100908"),
+    #             ("Yyteri", "yyteri", "http://www.purjelautaliitto.fi/yyteriweather/", '', 'self.wind_speed>=5 and self.wind_dir>=170 and self.wind_dir<=315'),
              ("FmiBeta", "Tahkoluoto", "101267", '', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315'),
-             ("FmiBeta", "Tankar", "101661"),
-             ("FmiBeta", "Ulkokalla", "101673"),
-             ("FmiBeta", "Marjaniemi", "101784"),
-             ("FmiBeta", "Vihreäsaari", "101794"),
-             ]
-
-#stations = [
-    #("Ilml", "Kaisaniemi", "station=2978&place=Helsinki"),
-#             ("Saapalvelu", "koivusaari", "/helsinki/index.php"),
-#             ("Omasaa", "mulan", "/mulan/", '', 'self.wind_speed>=6 and self.wind_dir>=78 or self.wind_dir<=20'),
-#             ("Bw", "eira", "http://eira.poista.net/lastWeather", "http://eira.poista.net/logWeather"),
-#             ("FmiBeta", "Harmaja", "100996"),
-#             ("FmiBeta", "Tulliniemi", "100946"),
-#             ("Windguru", "laru", "id_station=47&password=contribyte"),
-#             ]
+    ("FmiBeta", "Tankar", "101661"),
+    ("FmiBeta", "Ulkokalla", "101673"),
+    ("FmiBeta", "Marjaniemi", "101784"),
+    ("FmiBeta", "Vihreäsaari", "101794"),
+]
 
 spots = [ 
     ('Laru', 
@@ -683,6 +632,10 @@ class DataGather(object):
         hr = int(hm[0])
         min = int(hm[1])
         old = False
+        tm = time.time()
+        t=time.localtime(tm)
+        hour=t.tm_hour
+        minute=t.tm_min
         if hour >= hr:
             old = hour * 60 + minute - (hr * 60 + min) > oldLimitMin
         else:
@@ -1103,40 +1056,3 @@ def gatherAllStationData(_fmiApiKey):
     return (htmlCode, list)
 
 
-def updateStationsFile(list):
-    if os.uname()[1] == 'kopsu.com':
-        dir = '/home/webadmin/kopsu.com/html/wind_data/'
-    elif os.uname()[1] == 'Macintosh.local' or os.uname()[1] == 'Taru-MacBook-Pro-4.local':
-        dir = './wind_data/'
-    elif os.uname()[2].find("amzn") > 0:
-        dir = "/var/www/html/wind_data/"
-    else:
-        dir = os.environ.get("HOME") + '/public_html/wind_data/'
-
-    stationsFile = 'stations.txt'
-
-    sf = open(dir + stationsFile, "w")
-    sf.write(str(time.tm_year) + "," + str(time.tm_yday))
-    sf.write("\n")
-    for l in list:
-        sf.write(l.name)
-        sf.write("\n")
-        datafile = dir + l.name + "_" + str(time.tm_year) + "-" + str(time.tm_yday) + ".txt"
-        lastline = []
-        if os.path.exists(datafile):
-            f = open(datafile, "r+")
-            for line in f:
-                if len(line.split(',')) > 6:
-                    lastline = line.split(',')
-        else:
-            f = open(datafile, "w")
-        if len(lastline) == 0 or lastline[5] != l.time:
-            f.write(str(time.tm_year) + ',' + str(time.tm_mon) + ',' + str(time.tm_mday) + ',' + str(time.tm_hour) + ',' + str(time.tm_min) + ',' + str(l.time) + ',' + str(l.wind_dir) + ',' + str(l.wind_low) + ',' + str(l.wind_speed) + ',' + str(l.wind_max) + ',' + str(l.temp).replace(',','.'))
-            f.write("\n")
-        f.close()
-    sf.close()
-
-#(htmlCode, list) = gatherAllStationData()
-#for l in htmlCode:
-#    print l,
-#updateStationsFile(list)

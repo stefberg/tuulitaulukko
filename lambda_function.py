@@ -1,19 +1,18 @@
 import boto3 
-import urllib
 import winds_lib
 import time
 import os
 
-def getUrl(url):
-    f = urllib.urlopen(url)
-    res = f.read()
-    f.close()
-    return res
+def updateStationsFile(client, list):
+    stationsData = str(time.tm_year) + "," + str(time.tm_yday) + "\n"
+    for l in list:
+        stationsData += l.name + "\n"
+    client.put_object(Body=stationsData, Bucket='windupdate', Key='wind_data/stations.txt', ACL='public-read', ContentType='text/plain;charset=utf-8')
 
 def lambda_handler(event, context):
     os.environ["TZ"] = "Europe/Helsinki"
     time.tzset()
-    print "starting update v2"
+    print "starting update"
     windData = ""
     client = boto3.client('s3')
     obj = client.get_object(Bucket='windupdate', Key='fmi_api_key.txt')
@@ -22,5 +21,7 @@ def lambda_handler(event, context):
     for l in htmlCode:
         windData += l + "\n"
     client.put_object(Body=windData, Bucket='windupdate', Key='winds.html', ACL='public-read', ContentType='text/html;charset=utf-8')
-    print "update done"
-    return 'Hello from Lambda'
+    print "wind update done"
+    updateStationsFile(client, list)
+    print "stations file update done"
+    return 'OK'

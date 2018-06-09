@@ -33,4 +33,38 @@ time.tzset()
 (htmlCode, list) = winds_lib.gatherAllStationData(getApiKey())
 for l in htmlCode:
     print l,
-winds_lib.updateStationsFile(list)
+
+def updateStationsFile(list):
+    if os.uname()[1] == 'kopsu.com':
+        dir = '/home/webadmin/kopsu.com/html/wind_data/'
+    elif os.uname()[1] == 'Macintosh.local' or os.uname()[1] == 'Taru-MacBook-Pro-4.local':
+        dir = './wind_data/'
+    elif os.uname()[2].find("amzn") > 0:
+        dir = "/var/www/html/wind_data/"
+    else:
+        dir = os.environ.get("HOME") + '/public_html/wind_data/'
+
+    stationsFile = 'stations.txt'
+
+    sf = open(dir + stationsFile, "w")
+    sf.write(str(time.tm_year) + "," + str(time.tm_yday))
+    sf.write("\n")
+    for l in list:
+        sf.write(l.name)
+        sf.write("\n")
+        datafile = dir + l.name + "_" + str(time.tm_year) + "-" + str(time.tm_yday) + ".txt"
+        lastline = []
+        if os.path.exists(datafile):
+            f = open(datafile, "r+")
+            for line in f:
+                if len(line.split(',')) > 6:
+                    lastline = line.split(',')
+        else:
+            f = open(datafile, "w")
+        if len(lastline) == 0 or lastline[5] != l.time:
+            f.write(str(time.tm_year) + ',' + str(time.tm_mon) + ',' + str(time.tm_mday) + ',' + str(time.tm_hour) + ',' + str(time.tm_min) + ',' + str(l.time) + ',' + str(l.wind_dir) + ',' + str(l.wind_low) + ',' + str(l.wind_speed) + ',' + str(l.wind_max) + ',' + str(l.temp).replace(',','.'))
+            f.write("\n")
+            f.close()
+            sf.close()
+
+updateStationsFile(list)
