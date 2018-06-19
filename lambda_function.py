@@ -1,5 +1,6 @@
 import boto3 
 import winds_lib
+import winds_ee_lib
 import time
 import os
 
@@ -44,4 +45,12 @@ def lambda_handler(event, context):
     print "wind update done"
     updateStationsFile(client, list)
     print "stations file update done"
+
+    print "fetching data for eesti stations"
+    htmlCode = winds_ee_lib.gatherAllStationData()
+    windData = ""
+    for l in htmlCode:
+        windData += l + "\n"
+    client.put_object(Body=windData, Bucket='windupdate', Key='winds_ee.html', ACL='public-read', ContentType='text/html;charset=utf-8')
+    print "wind update for ee done"
     return 'OK'
