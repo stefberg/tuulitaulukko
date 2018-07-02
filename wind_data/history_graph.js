@@ -1,5 +1,5 @@
 
-var xmlhttp;
+var xmlhttp=null;
 var canvas;
 var context;
 var windowMatrix;
@@ -305,25 +305,24 @@ function startFetchData()
 
 function fetchData(day)
 {
-//    debug(day);
-    
+    //    debug(day);
+    var file = dataDir + fetchStation + "_" + fetchYear + "-" + day + ".txt";
+    //    debug(file);
     xmlhttp.onreadystatechange=function()
-        {
-	  if (xmlhttp.readyState==4) {
+    {
+	if (xmlhttp.readyState==4) {
 	    if (xmlhttp.status == httpStatusOK)
-	      {
+	    {
 		//                debug(xmlhttp.responseText);
 		parseData(day, xmlhttp.responseText);
-        lastFetchedDay = day;
+		lastFetchedDay = day;
 		drawGraph();
-	      }
-	    if (day != fetchEndDay) {
-	      fetchData(day+1);
 	    }
-	  }
+	    if (day != fetchEndDay) {
+		fetchData(day+1);
+	    }
 	}
-    var file = dataDir + fetchStation + "_" + fetchYear + "-" + day + ".txt";
-//    debug(file);
+    }
     xmlhttp.open("GET", file, true);
     xmlhttp.send();
 }
@@ -450,13 +449,13 @@ function parseStationsList(doFirst)
 function fetchStations(doFirst) 
 {
     xmlhttp.onreadystatechange=function()
+    {
+        if (xmlhttp.readyState==4 && xmlhttp.status == httpStatusOK)
         {
-          if (xmlhttp.readyState==4 && xmlhttp.status == httpStatusOK)
-          {
-            stationsList = xmlhttp.responseText;
-            parseStationsList(doFirst);
-          }
+	    stationsList = xmlhttp.responseText;
+	    parseStationsList(doFirst);
         }
+    }
     xmlhttp.open("GET", dataDir + "stations.txt", true);
     xmlhttp.send();
 }
@@ -490,7 +489,9 @@ function initGraph(doFirst)
   }
     canvas = document.getElementById("graphCanvas");
     context = canvas.getContext("2d");
-    xmlhttp=new XMLHttpRequest();
+    if (window.location.protocol.startsWith('http')) {
+	xmlhttp=new XMLHttpRequest();
+    }
     fetchStation = window.location.hash.replace('#', '');
     fetchNumDays = parseInt(document.getElementById('days').value);
     fetchStations(doFirst);
