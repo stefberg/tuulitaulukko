@@ -10,10 +10,10 @@ Resources:
       CodeUri: .
       Description: ''
       MemorySize: 128
-      Timeout: 9
+      Timeout: 11
       Role: 'arn:aws:iam::514307432574:role/service-role/WindUpdateRole'
       Events:
         Schedule1:
           Type: Schedule
           Properties:
-            Schedule: rate(10 minutes)
+            Schedule: rate(5 minutes)
