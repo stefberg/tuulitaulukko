@@ -9,8 +9,10 @@ import cgi
 import re
 import datetime
 
-baseurl = 'http://data.fmi.fi/'
+baseurl = 'http://data.fmi.fi'
+baseurl2 = 'http://opendata.fmi.fi'
 fmiApiKey = ''
+useApiKey = True
 
 request = 'getFeature'
 query = 'fmi::observations::weather::timevaluepair'
@@ -20,6 +22,7 @@ def getTime(start):
     return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() - start*24*3600))
 
 def getUrl(url):
+#    print url
     f = urllib.urlopen(url)
     res = f.read()
     f.close()
@@ -36,7 +39,11 @@ def getText(node):
 def getMeasurements(key, station, starttime, endtime, timestep, param):
     global fmiApiKey
     fmiApiKey = key
-    query_url = baseurl + 'fmi-apikey/' + fmiApiKey + '/wfs?' + 'request=' + request + '&storedquery_id=' + query + '&fmisid=' + station +  '&parameters=' + param + '&starttime=' + starttime + '&endtime=' + endtime + '&timestep=' + str(timestep)
+    if useApiKey:
+        query_url = baseurl + '/fmi-apikey/' + fmiApiKey
+    else:
+        query_url = baseurl2
+    query_url = query_url + '/wfs?request=' + request + '&storedquery_id=' + query + '&fmisid=' + station +  '&parameters=' + param + '&starttime=' + starttime + '&endtime=' + endtime + '&timestep=' + str(timestep)
     #print >>sys.stderr, query_url
     return getUrl(query_url)
 
