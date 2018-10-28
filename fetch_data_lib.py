@@ -8,11 +8,12 @@ import sys
 import cgi
 import re
 import datetime
+import socket
 
 baseurl = 'http://data.fmi.fi'
 baseurl2 = 'http://opendata.fmi.fi'
 fmiApiKey = ''
-useApiKey = True
+useApiKey = False
 
 request = 'getFeature'
 query = 'fmi::observations::weather::timevaluepair'
@@ -22,12 +23,17 @@ def getTime(start):
     return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() - start*24*3600))
 
 def getUrl(url):
-#    print url
-    f = urllib.urlopen(url)
-    res = f.read()
-    f.close()
-#    print res
-    return res
+    print "urllib.urlopen", url
+    try:
+        socket.setdefaulttimeout(4)
+        f = urllib.urlopen(url)
+        print "read"
+        res = f.read()
+        f.close()
+        return res
+    except IOError:
+        print "IOError:", url
+        return ""
 
 def getText(node):
     allText = ''
