@@ -1,8 +1,7 @@
-2018,308
+2020,10
 Emäsalo
-Kalbådagrund
 Itätoukki
-Villinginluoto
+Hel.Majakka
 Harmaja
 Laru
 eira
@@ -10,6 +9,7 @@ Bågaskär
 Jussarö
 Mulan
 Tulliniemi
+Russarö
 Vänö
 Utö
 Tahkoluoto

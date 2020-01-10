@@ -799,15 +799,20 @@ class WindguruGather(DataGather):
         self.observationJson = getUrl(windguruApiUrl + self.station)
 #        print >>sys.stderr, self.observationJson
         self.observation = eval(self.observationJson.replace("null", "0"))
-        if len(self.observation) > 0:
-            self.found = True
-            self.wind_speed = round(float(self.observation["wind_avg"])/ms_to_knts,1)
-            self.wind_max = round(float(self.observation["wind_max"])/ms_to_knts,1)
-            self.wind_low = round(float(self.observation["wind_min"])/ms_to_knts,1)
-            self.wind_dir = round(float(self.observation["wind_direction"]),1)
-            self.temp = float(self.observation["temperature"])
-            tmp = self.observation["datetime"].split(' ')[1].split(':')
-            self.time = tmp[0] + ":" + tmp[1]
+        try:
+            if len(self.observation) > 0:
+                self.found = True
+                self.wind_speed = round(float(self.observation["wind_avg"])/ms_to_knts,1)
+                self.wind_max = round(float(self.observation["wind_max"])/ms_to_knts,1)
+                self.wind_low = round(float(self.observation["wind_min"])/ms_to_knts,1)
+                self.wind_dir = round(float(self.observation["wind_direction"]),1)
+                self.temp = float(self.observation["temperature"])
+                tmp = self.observation["datetime"].split(' ')[1].split(':')
+                self.time = tmp[0] + ":" + tmp[1]
+        except:
+            print >>sys.stderr, "Problems with data from WindGuru", self.observationJson
+            traceback.print_exc(file=sys.stderr)
+            self.found = False
 
 class HolfuyGather(DataGather):
 
