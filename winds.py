@@ -46,13 +46,16 @@ def updateStationsFile(list):
 
     stationsFile = 'stations.txt'
 
+    tm = time.time()
+    timeObj=time.localtime(tm)
+
     sf = open(dir + stationsFile, "w")
-    sf.write(str(time.tm_year) + "," + str(time.tm_yday))
+    sf.write(str(timeObj.tm_year) + "," + str(timeObj.tm_yday))
     sf.write("\n")
     for l in list:
         sf.write(l.name)
         sf.write("\n")
-        datafile = dir + l.name + "_" + str(time.tm_year) + "-" + str(time.tm_yday) + ".txt"
+        datafile = dir + l.name + "_" + str(timeObj.tm_year) + "-" + str(timeObj.tm_yday) + ".txt"
         lastline = []
         if os.path.exists(datafile):
             f = open(datafile, "r+")
@@ -62,9 +65,9 @@ def updateStationsFile(list):
         else:
             f = open(datafile, "w")
         if len(lastline) == 0 or lastline[5] != l.time:
-            f.write(str(time.tm_year) + ',' + str(time.tm_mon) + ',' + str(time.tm_mday) + ',' + str(time.tm_hour) + ',' + str(time.tm_min) + ',' + str(l.time) + ',' + str(l.wind_dir) + ',' + str(l.wind_low) + ',' + str(l.wind_speed) + ',' + str(l.wind_max) + ',' + str(l.temp).replace(',','.'))
+            f.write(str(timeObj.tm_year) + ',' + str(timeObj.tm_mon) + ',' + str(timeObj.tm_mday) + ',' + str(timeObj.tm_hour) + ',' + str(timeObj.tm_min) + ',' + str(l.time) + ',' + str(l.wind_dir) + ',' + str(l.wind_low) + ',' + str(l.wind_speed) + ',' + str(l.wind_max) + ',' + str(l.temp).replace(',','.'))
             f.write("\n")
             f.close()
-            sf.close()
+    sf.close()
 
 updateStationsFile(list)
