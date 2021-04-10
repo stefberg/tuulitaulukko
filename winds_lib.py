@@ -131,7 +131,7 @@ spots = [
  ),
     ('Slaktis', 
      ( # one star condition
-         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=235 and self.wind_dir<=275'),
+         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=235 and self.wind_dir<=310'),
      )
  ),
     ('Yyteri', 
