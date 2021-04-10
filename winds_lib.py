@@ -4,10 +4,10 @@
 import time
 import datetime
 from datetime import timedelta
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import string
 import traceback
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 import re
 import os
 import sys
@@ -173,11 +173,11 @@ windguruApiUrl='https://www.windguru.cz/int/wgsapi.php?q=station_data_current&'
 holfuyApiUrl="http://holfuy.com/en/modules/mjso.php?"
 holfuyInfoUrl="http://holfuy.com/en/data/114"
 #ret={"wind_avg":2.72,"wind_max":4.85,"wind_min":1.16,"wind_direction":168.1,"temperature":15.1,"mslp":0,"rh":0,"datetime":"2014-06-28 20:31:35 EEST","unixtime":1403976695,"error_details":""}
-#print ret
+#print(ret)
 #exit()
 
 def getUrl(url):
-    f = urllib.urlopen(url)
+    f = urllib.request.urlopen(url)
     res = f.read()
     f.close()
     return res
@@ -185,8 +185,8 @@ def getUrl(url):
 #guruData = getUrl(windguruUrl + "&q=station_data_current&id_station=47")
 #evalThis = guruData[2:len(guruData)-2].replace("null", "0")
 #ret=eval(evalThis)
-#print ret
-#print "wind max", float(ret["wind_max"])/ms_to_knts
+#print(ret)
+#print("wind max", float(ret["wind_max"])/ms_to_knts)
 #exit()
 
 
@@ -406,10 +406,10 @@ class SaapalveluParser(HTMLParser):
             self.divLevel += 1
             if len(attrs) > 0 and attrs[0][0] == 'class' and attrs[0][1] == 'weather-box weather-box-thermometer':
                 self.intempBox = self.divLevel
-#                print >>sys.stderr, attrs[0][1]
+#                print(attrs[0][1], file=sys.stderr)
             if len(attrs) > 0 and attrs[0][0] == 'class' and attrs[0][1] == 'weather-box weather-box-wind':
                 self.inwindBox = self.divLevel
-#                print >>sys.stderr, attrs[0][1]
+#                print(attrs[0][1], file=sys.stderr)
             
     def handle_endtag(self, tag):
 #            self.intemp = False
@@ -431,21 +431,21 @@ class SaapalveluParser(HTMLParser):
             if reg:
                 self.temp = reg.group(1).replace(",", ".")
                 self.intemp = 0
-#                print >>sys.stderr, "temp: ", self.temp
+#                print("temp: ", self.temp, file=sys.stderr)
 
         if self.intemp and data == "Tll hetkell":
             self.intemp = 2
-#            print >>sys.stderr, data
+#            print(data, file=sys.stderr)
             
         if self.intempBox and data == "Lmptila":
             self.intemp = 1
-#            print >>sys.stderr, data
+#            print(data, file=sys.stderr)
 
         if self.inwind == 2:
             reg = re.search('([0-9]+[,\.]*[0-9]*) m/s', data)
             if reg:
                 self.wind_max = reg.group(1).replace(",", ".")
-#                print >>sys.stderr, "wind_speed: ", self.wind_speed
+#                print("wind_speed: ", self.wind_speed, file=sys.stderr)
                 self.inwind = 1
                 self.found = True
 
@@ -453,14 +453,14 @@ class SaapalveluParser(HTMLParser):
             reg = re.search('([0-9]+[,\.]*[0-9]*) m/s', data)
             if reg:
                 self.wind_speed = reg.group(1).replace(",", ".")
-#                print >>sys.stderr, "wind_max: ", self.wind_max
+#                print("wind_max: ", self.wind_max, file=sys.stderr)
                 self.inwind = 1
 
         if self.inwind == 4:
             reg = re.search('\(([0-9]+)$', data)
             if reg:
                 self.wind_dir = reg.group(1)
-#                print >>sys.stderr, "wind_dir: ", self.wind_dir
+#                print("wind_dir: ", self.wind_dir, file=sys.stderr)
                 self.inwind = 1
 
         if self.inwind == 1 and data == "Tuulen suunta ":
@@ -479,7 +479,7 @@ class SaapalveluParser(HTMLParser):
             reg = re.search(' ([0-9]+:[0-9]+)', data)
             if reg:
                 self.time = reg.group(1)
-#                print >>sys.stderr, "time: ", self.time
+#                print("time: ", self.time, file=sys.stderr)
                 self.intime = 0
 
         if self.intime == 1 and data == "klo":
@@ -519,10 +519,10 @@ class SaapalveluParser(HTMLParser):
 #page = getUrl(yyteriUrl)
 #parser = YyteriParser("")
 #parser.feed(page)
-#print parser.time
-#print parser.wind_dir
-#print parser.wind_speed
-#print parser.wind_max
+#print(parser.time)
+#print(parser.wind_dir)
+#print(parser.wind_speed)
+#print(parser.wind_max)
 #exit()
 
 class OmasaaParser(HTMLParser):
@@ -642,7 +642,7 @@ class DataGather(object):
         else:
             old = 24*60 - hour * 60 + minute + (hr * 60 + min) > oldLimitMin    
 #        if old:
-#            print >>sys.stderr, "old time: ", "hour", hour, "minute", minute, "station hour", hr, "station min", min, "limit", oldLimitMin
+#            print("old time: ", "hour", hour, "minute", minute, "station hour", hr, "station min", min, "limit", oldLimitMin, file=sys.stderr)
         return old
 
 class YyteriGather(DataGather):
@@ -797,7 +797,7 @@ class WindguruGather(DataGather):
 
     def doGather(self):
         self.observationJson = getUrl(windguruApiUrl + self.station)
-#        print >>sys.stderr, self.observationJson
+#        print(self.observationJson, file=sys.stderr)
         self.observation = eval(self.observationJson.replace("null", "0"))
         try:
             if len(self.observation) > 0:
@@ -810,7 +810,7 @@ class WindguruGather(DataGather):
                 tmp = self.observation["datetime"].split(' ')[1].split(':')
                 self.time = tmp[0] + ":" + tmp[1]
         except:
-            print >>sys.stderr, "Problems with data from WindGuru", self.observationJson
+            print("Problems with data from WindGuru", self.observationJson, file=sys.stderr)
             traceback.print_exc(file=sys.stderr)
             self.found = False
 
@@ -838,7 +838,7 @@ class HolfuyGather(DataGather):
                     tm = self.observation["updated"].split(' ')[1].split(":")
                     self.time = tm[0]+":"+tm[1]
         except:
-            print >>sys.stderr, "Problems with data from Holfui", self.observationJson
+            print("Problems with data from Holfui", self.observationJson, file=sys.stderr)
             traceback.print_exc(file=sys.stderr)
             self.found = False
 
@@ -851,7 +851,7 @@ nullStation = DataGather('', '')
 #          ( (station1, condition3), (station2, condition3) ), ) ]
 
 def onkoSpotillaKelia(spot, S):
-#    print >>sys.stderr, "spot: ", spot
+#    print("spot: ", spot, file=sys.stderr)
     stars = 0
     spotname = spot[0]
     for conditions in spot[1:]:
@@ -860,12 +860,12 @@ def onkoSpotillaKelia(spot, S):
             if len(station) < 2:
                 continue
             name = station[0]
-#            print >>sys.stderr, "name: ", name
+#            print("name: ", name, file=sys.stderr)
             if name in S and S[name].found and not S[name].oldTime():
                 condition = station[1]
                 condition = condition.replace('self.', 'S["'+name+'"].')
                 ret = eval(condition)
-#                print >>sys.stderr, name, condition, ret
+#                print(name, condition, ret, file=sys.stderr)
                 if ret:
                     add_star = True
                 else:
@@ -1023,7 +1023,7 @@ def gatherAllStationData(_fmiApiKey):
     htmlCode.append('	  </th>\n')
     htmlCode.append('	</tr>\n')
 
-    for i, spot in zip(range(len(spots)), spots):
+    for i, spot in zip(list(range(len(spots))), spots):
         if i % 2 == 0:
             htmlCode.append('<tr>\n')
         stars = onkoSpotillaKelia(spot, S)

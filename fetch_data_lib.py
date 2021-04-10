@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import xml.dom.minidom
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import time
 import os
 import sys
@@ -23,16 +23,16 @@ def getTime(start):
     return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() - start*24*3600))
 
 def getUrl(url):
-    print "urllib.urlopen", url
+    print("urllib.urlopen", url)
     try:
         socket.setdefaulttimeout(4)
-        f = urllib.urlopen(url)
-        print "read"
+        f = urllib.request.urlopen(url)
+        print("read")
         res = f.read()
         f.close()
         return res
     except IOError:
-        print "IOError:", url
+        print("IOError:", url)
         return ""
 
 def getText(node):
@@ -50,7 +50,7 @@ def getMeasurements(key, station, starttime, endtime, timestep, param):
     else:
         query_url = baseurl2
     query_url = query_url + '/wfs?request=' + request + '&storedquery_id=' + query + '&fmisid=' + station +  '&parameters=' + param + '&starttime=' + starttime + '&endtime=' + endtime + '&timestep=' + str(timestep)
-    #print >>sys.stderr, query_url
+    #print(query_url, file=sys.stderr)
     return getUrl(query_url)
 
 def getMeasurementsDuration(key, station, duration, param):
@@ -84,9 +84,9 @@ def parseData(page):
     try:
         dom = xml.dom.minidom.parseString(page)
     except:
-        print >> sys.stderr, page
+        print(page, file=sys.stderr)
         return []
-    #print page
+    #print(page)
     members = dom.getElementsByTagName("wfs:member")
     observationsArray = []
     for member in members:

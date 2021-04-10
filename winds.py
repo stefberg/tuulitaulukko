@@ -19,8 +19,8 @@ def getApiKey():
         else:
             dir = '/hsphere/local/home/saberg/winds/'
         api_key_file = dir + 'fmi_api_key.txt'
-        #print os.uname()[1]
-        #print "APIKEY file", api_key_file
+        #print(os.uname()[1])
+        #print("APIKEY file", api_key_file)
         f = open(api_key_file, "r")
         apikey = f.read();
         apikey = apikey.replace('\n', '')
@@ -32,7 +32,7 @@ time.tzset()
 
 (htmlCode, list) = winds_lib.gatherAllStationData(getApiKey())
 for l in htmlCode:
-    print l,
+    print(l, end=' ')
 
 def updateStationsFile(list):
     if os.uname()[1] == 'kopsu.com':
