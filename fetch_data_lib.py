@@ -67,7 +67,7 @@ def getMeasurementsDuration(key, station, duration, param):
 
 def formatTime(tm):
     # 2013-03-23T09:20:00Z
-    reg = re.search('([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)Z', tm)
+    reg = re.search('([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)Z', tm.decode('utf-8'))
     year = reg.group(1)
     month = reg.group(2)
     day = reg.group(3)

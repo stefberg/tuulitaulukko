@@ -374,8 +374,8 @@ class YyteriParser(HTMLParser):
 def onlyAscii(a):
     b=''
     for i in range(0, len(a)):
-        if string.printable.find(a[i]) >= 0:
-            b = b+a[i]
+        if string.printable.find(str(a[i])) >= 0:
+            b = b+str(a[i])
     return b
 
 class SaapalveluParser(HTMLParser):
@@ -593,7 +593,7 @@ class bwParser:
         self.text = getUrl(url)
         if len(self.text) < 10:
             return
-        reg = re.search('([0-9]+:[0-9]+)[ \t]*Dir:[ \t]*([0-9]+)[ \t]*.*Low:[ \t]*([0-9\.]+)[ \t]*-[ \t]*([0-9\.]+)[ \t]*Avg:[ \t]*([0-9\.]+)[ \t]*High:[ \t]*([0-9\.]+)[ \t]*-[ \t]*([0-9\.]+)[ \t]*([-0-9\.]+)', self.text)
+        reg = re.search(b'([0-9]+:[0-9]+)[ \t]*Dir:[ \t]*([0-9]+)[ \t]*.*Low:[ \t]*([0-9\.]+)[ \t]*-[ \t]*([0-9\.]+)[ \t]*Avg:[ \t]*([0-9\.]+)[ \t]*High:[ \t]*([0-9\.]+)[ \t]*-[ \t]*([0-9\.]+)[ \t]*([-0-9\.]+)', self.text)
         if reg:
             self.time  = reg.group(1)
             self.wind_dir = reg.group(2)
@@ -798,7 +798,7 @@ class WindguruGather(DataGather):
     def doGather(self):
         self.observationJson = getUrl(windguruApiUrl + self.station)
 #        print(self.observationJson, file=sys.stderr)
-        self.observation = eval(self.observationJson.replace("null", "0"))
+        self.observation = eval(self.observationJson.replace(b"null", b"0"))
         try:
             if len(self.observation) > 0:
                 self.found = True
