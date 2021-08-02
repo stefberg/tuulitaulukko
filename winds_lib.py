@@ -798,8 +798,8 @@ class WindguruGather(DataGather):
     def doGather(self):
         self.observationJson = getUrl(windguruApiUrl + self.station)
 #        print(self.observationJson, file=sys.stderr)
-        self.observation = eval(self.observationJson.replace(b"null", b"0"))
         try:
+            self.observation = eval(self.observationJson.replace(b"null", b"0"))
             if len(self.observation) > 0:
                 self.found = True
                 self.wind_speed = round(float(self.observation["wind_avg"])/ms_to_knts,1)
