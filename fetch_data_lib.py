@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import xml.dom.minidom
 import urllib.request, urllib.parse, urllib.error
