@@ -627,6 +627,7 @@ class DataGather(object):
         return self.keli_ehto  and not self.oldTime() and eval(self.keli_ehto)
 
     def oldTime(self):
+        return False
         hm = self.time.split(':')
         if len(hm) < 2:
             return False
@@ -880,14 +881,14 @@ def gatherAllStationData(_fmiApiKey):
     fmiApiKey = _fmiApiKey
 
     S = {} # stations to use when checking wind on spots
-    list = []
+    res_list = []
 
     for v in stations:
         try:
             gatherer = eval(v[0] + "Gather(v)")
             gatherer.doGather()
             if gatherer.found:
-                list.append(gatherer)
+                res_list.append(gatherer)
                 S[nameToVar(gatherer.name)] = gatherer
             else:
                 S[nameToVar(gatherer.name)] = nullStation
@@ -969,7 +970,7 @@ def gatherAllStationData(_fmiApiKey):
 
     odd = 1
 
-    for l in list:
+    for l in res_list:
         htmlCode.append('	<tr class="')
         if l.oldTime():
             htmlCode.append("oldtime")
@@ -1059,6 +1060,6 @@ def gatherAllStationData(_fmiApiKey):
     htmlCode.append('<a href="winds_ee.html">Eesti asemat</a><br/><br/>')
     htmlCode.append('Data <a href="http://ilmatieteenlaitos.fi/avoin-data">Ilmatieteen laitos</a><br/>' + str(datetime.datetime.now()))
     htmlCode.append(' </html>')
-    return (htmlCode, list)
+    return (htmlCode, res_list)
 
 
