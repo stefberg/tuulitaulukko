@@ -627,8 +627,11 @@ class DataGather(object):
         return self.keli_ehto  and not self.oldTime() and eval(self.keli_ehto)
 
     def oldTime(self):
-        return False
-        hm = self.time.split(':')
+        print(self.time)
+        if isinstance(self.time, str):
+            hm = self.time.split(':')
+        else:
+            hm = self.time.split(b':')
         if len(hm) < 2:
             return False
         hr = int(hm[0])
