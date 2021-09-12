@@ -19,7 +19,7 @@ def getUrl(url):
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
         }
     )
-    return urllib.request.urlopen(req).read()
+    return urllib.request.urlopen(req).read().decode("iso-8859-1")
 
 def gatherAllStationData():
     page = getUrl(url)
@@ -59,7 +59,7 @@ def gatherAllStationData():
         for text in node.childNodes:
             if text.nodeType == text.TEXT_NODE:
                 allText = allText + text.data
-        return allText.encode("utf-8")
+        return allText
 
     if "SERVER_NAME" in os.environ:
         htmlCode.append('Content-Type: text/html\n')
