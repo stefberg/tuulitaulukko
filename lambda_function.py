@@ -16,7 +16,7 @@ def updateStationsFile(client, list):
         lastline = ''
         try:
             obj = client.get_object(Bucket='dlarah.org', Key=datafile)
-            data = obj['Body'].read()
+            data = obj['Body'].read().decode("utf-8")
             lines = data.split("\n")
             if len(lines) > 1:
                 lastline = lines[len(lines)-2]

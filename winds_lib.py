@@ -595,7 +595,7 @@ class bwParser:
             return
         reg = re.search(b'([0-9]+:[0-9]+)[ \t]*Dir:[ \t]*([0-9]+)[ \t]*.*Low:[ \t]*([0-9\.]+)[ \t]*-[ \t]*([0-9\.]+)[ \t]*Avg:[ \t]*([0-9\.]+)[ \t]*High:[ \t]*([0-9\.]+)[ \t]*-[ \t]*([0-9\.]+)[ \t]*([-0-9\.]+)', self.text)
         if reg:
-            self.time  = reg.group(1)
+            self.time  = reg.group(1).decode("utf-8")
             self.wind_dir = reg.group(2)
             self.wind_low = reg.group(4)
             self.wind_speed = reg.group(5)
