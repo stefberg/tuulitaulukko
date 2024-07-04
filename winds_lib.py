@@ -27,6 +27,8 @@ stations = [
     #             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
 #    ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
     ("FmiBeta", "Itätoukki", "105392", '', 'self.wind_speed>=7'),
+    ("FmiBeta", "Vuosaari", "151028"),
+    ("Swell", "Kruunuvuorenselkä", "https://swell.fmi.fi/Marinehelsinki/csv/kruunuvuorenselka_weatherdata.csv", "https://swell.fmi.fi/Marinehelsinki/"),
     ("Windguru", "Villinginluoto", "id_station=1137&password=vitsiPorkkana12", '', 'self.wind_speed>=6 and self.wind_dir>=75 and self.wind_dir<=290'),
     ("FmiBeta", "Hel.Majakka", "101003"),
     ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
@@ -38,7 +40,7 @@ stations = [
     #             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("FmiBeta", "Bågaskär", "100969"),
     ("FmiBeta", "Jussarö", "100965"),
-    ("Omasaa", "Mulan", "/mulan/", '', 'self.wind_speed>=7 and ( self.wind_dir>=78 or self.wind_dir<=20 )'),
+#    ("Omasaa", "Mulan", "/mulan/", '', 'self.wind_speed>=7 and ( self.wind_dir>=78 or self.wind_dir<=20 )'),
     #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
              ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=78 and self.wind_dir<=205'),
     ("FmiBeta", "Russarö", "100932"),
@@ -177,6 +179,7 @@ holfuyInfoUrl="http://holfuy.com/en/data/114"
 #exit()
 
 def getUrl(url):
+#    print(url, file=sys.stderr)
     f = urllib.request.urlopen(url)
     res = f.read()
     f.close()
@@ -603,6 +606,34 @@ class bwParser:
             self.temp = reg.group(8)
             self.found = True
 
+class csvParser:
+
+    def __init__(self, info_url):
+        self.time = 0
+        self.wind_dir = 0
+        self.wind_low = 0
+        self.wind_speed = 0
+        self.wind_max = 0
+        self.temp = 0
+        self.found = False
+        self.info_url = info_url
+
+    def parse(self, url):
+        self.text = getUrl(url)
+        if len(self.text) < 10:
+            return
+        lines = self.text.decode("utf-8").splitlines()
+        if len(lines) > 10:
+            res = lines[-1].split(',')
+            if len(res) > 6:
+                self.time  = res[0]
+                self.wind_dir = res[4]
+                self.wind_low = res[2]
+                self.wind_speed = res[2]
+                self.wind_max = res[3]
+                self.temp = res[5]
+                self.found = True
+
 class DataGather(object):
     
     def __init__(self, initData, info_url):
@@ -611,6 +642,7 @@ class DataGather(object):
         else:
             self.name = ''
         self.time = "00:00"
+        self.display_time = "00:00"
         self.wind_dir = 0
         self.wind_low = 0
         self.wind_speed = 0
@@ -627,15 +659,26 @@ class DataGather(object):
         return self.keli_ehto  and not self.oldTime() and eval(self.keli_ehto)
 
     def oldTime(self):
-        print(self.time)
+#        print(self.time)
+        hour = -1
+        tryformats = ["%Y-%m-%dT%H:%M:%S", "%H:%M"]
+        date_time = None
+        self.display_time = self.time
         if isinstance(self.time, str):
-            hm = self.time.split(':')
+            timestr = self.time
         else:
-            hm = self.time.split(b':')
-        if len(hm) < 2:
+            timestr = self.time.decode("utf-8")
+        for tryformat in tryformats:
+            try:
+                date_time = datetime.datetime.strptime(timestr, tryformat)
+                break
+            except ValueError:
+                continue
+        if not date_time:
             return False
-        hr = int(hm[0])
-        min = int(hm[1])
+        hr = date_time.hour
+        min = date_time.minute
+        self.display_time = f"{hr}:{min}"
         old = False
         tm = time.time()
         t=time.localtime(tm)
@@ -754,6 +797,24 @@ class BwGather(DataGather):
 
     def doGather(self):
         self.parser = bwParser(self.info_url)
+        self.parser.parse(self.page_url)
+        if self.parser.found:
+            self.found = True
+            self.time = self.parser.time
+            self.wind_dir = float(self.parser.wind_dir)
+            self.wind_low = float(self.parser.wind_low)
+            self.wind_speed = float(self.parser.wind_speed)
+            self.wind_max = float(self.parser.wind_max)
+            self.temp = float(self.parser.temp)
+
+class SwellGather(DataGather):
+
+    def __init__(self, initData):
+        self.page_url = initData[2]
+        super(SwellGather, self).__init__(initData, initData[3])
+
+    def doGather(self):
+        self.parser = csvParser(self.info_url)
         self.parser.parse(self.page_url)
         if self.parser.found:
             self.found = True
@@ -987,7 +1048,7 @@ def gatherAllStationData(_fmiApiKey):
         htmlCode.append('">\n')
         odd = 1 - odd
         htmlCode.append('	  <td align="left"><a href="' + l.info_url + '">' + l.name + '</a></td>\n')
-        htmlCode.append('	  <td>' + str(l.time) + '</td>\n')
+        htmlCode.append('	  <td>' + str(l.display_time) + '</td>\n')
         htmlCode.append('	  <td><a href="javascript:showStation(\'' + l.name + '\', 2)">' + str(l.wind_dir) + '</a></td>\n')
         htmlCode.append('	  <td><a href="javascript:showStation(\'' + l.name + '\', 0)">' + str(l.wind_speed) + '</a></td>\n')
         htmlCode.append('	  <td><a href="javascript:showStation(\'' + l.name + '\', 0)">' + str(l.wind_max) + '</a></td>\n')

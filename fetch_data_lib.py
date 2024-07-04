@@ -23,11 +23,11 @@ def getTime(start):
     return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() - start*24*3600))
 
 def getUrl(url):
-    print("urllib.urlopen", url)
+#    print("urllib.urlopen", url)
     try:
         socket.setdefaulttimeout(4)
         f = urllib.request.urlopen(url)
-        print("read")
+#        print("read")
         res = f.read()
         f.close()
         return res

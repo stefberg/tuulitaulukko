@@ -17,7 +17,7 @@ def getApiKey():
         elif os.uname()[2].find("amzn") > 0:
             dir = "/var/www/keys/"
         else:
-            dir = '/hsphere/local/home/saberg/winds/'
+            dir = os.environ.get("HOME") + "/"
         api_key_file = dir + 'fmi_api_key.txt'
         #print(os.uname()[1])
         #print("APIKEY file", api_key_file)
@@ -42,7 +42,7 @@ def updateStationsFile(list):
     elif os.uname()[2].find("amzn") > 0:
         dir = "/var/www/html/wind_data/"
     else:
-        dir = os.environ.get("HOME") + '/public_html/wind_data/'
+        dir = os.environ.get("HOME") + '/wind_data/'
 
     stationsFile = 'stations.txt'
 
