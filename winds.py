@@ -27,8 +27,8 @@ def getApiKey():
         f.close()
     return apikey
 
-os.environ["TZ"] = "Europe/Helsinki"
-time.tzset()
+#os.environ["TZ"] = "Europe/Helsinki"
+#time.tzset()
 
 (htmlCode, list) = winds_lib.gatherAllStationData(getApiKey())
 for l in htmlCode:
