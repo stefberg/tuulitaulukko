@@ -85,6 +85,10 @@ function parseData(yday, dataStr)
   for (l = 0; l < sa.length; l++) {
     var fields = sa[l].split(",");
     if (fields.length > 5 && fields[5].indexOf(":") > 0) {
+      if (fields[5].indexOf("T") > 0) {
+        // time format is like "2024-07-06T10:00:00" so we leave just the last part to work like the hh:mm format like for other
+        fields[5] = fields[5].split("T")[1];
+      }
       var time = fields[5].split(":");
       var checkHour = parseInt(fields[3]);
       var hour = parseInt(trimLeading0(time[0]));
