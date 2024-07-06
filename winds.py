@@ -65,7 +65,7 @@ def updateStationsFile(list):
         else:
             f = open(datafile, "w")
         if len(lastline) == 0 or lastline[5] != l.time:
-            f.write(str(timeObj.tm_year) + ',' + str(timeObj.tm_mon) + ',' + str(timeObj.tm_mday) + ',' + str(timeObj.tm_hour) + ',' + str(timeObj.tm_min) + ',' + str(l.time) + ',' + str(l.wind_dir) + ',' + str(l.wind_low) + ',' + str(l.wind_speed) + ',' + str(l.wind_max) + ',' + str(l.temp).replace(',','.'))
+            f.write(str(timeObj.tm_year) + ',' + str(timeObj.tm_mon) + ',' + str(timeObj.tm_mday) + ',' + str(timeObj.tm_hour) + ',' + str(timeObj.tm_min) + ',' + str(l.display_time) + ',' + str(l.wind_dir) + ',' + str(l.wind_low) + ',' + str(l.wind_speed) + ',' + str(l.wind_max) + ',' + str(l.temp).replace(',','.'))
             f.write("\n")
             f.close()
     sf.close()

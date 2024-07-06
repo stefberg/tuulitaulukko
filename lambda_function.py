@@ -23,7 +23,7 @@ def updateStationsFile(client, list):
         except:
             print("new data", datafile)
         if len(lastline) == 0 or lastline[5] != l.time:
-            data += str(timeObj.tm_year) + ',' + str(timeObj.tm_mon) + ',' + str(timeObj.tm_mday) + ',' + str(timeObj.tm_hour) + ',' + str(timeObj.tm_min) + ',' + str(l.time) + ',' + str(l.wind_dir) + ',' + str(l.wind_low) + ',' + str(l.wind_speed) + ',' + str(l.wind_max) + ',' + str(l.temp).replace(',','.') + "\n"
+            data += str(timeObj.tm_year) + ',' + str(timeObj.tm_mon) + ',' + str(timeObj.tm_mday) + ',' + str(timeObj.tm_hour) + ',' + str(timeObj.tm_min) + ',' + str(l.display_time) + ',' + str(l.wind_dir) + ',' + str(l.wind_low) + ',' + str(l.wind_speed) + ',' + str(l.wind_max) + ',' + str(l.temp).replace(',','.') + "\n"
             client.put_object(Body=data, Bucket='dlarah.org', Key=datafile, ACL='public-read', ContentType='text/plain;charset=utf-8')
         else:
             print("duplicate line not added", lastline, l)

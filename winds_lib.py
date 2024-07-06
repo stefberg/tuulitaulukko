@@ -678,7 +678,7 @@ class DataGather(object):
             return False
         hr = date_time.hour
         min = date_time.minute
-        self.display_time = f"{hr}:{min}"
+        self.display_time = f"{hr:02}:{min:02}"
         old = False
         tm = time.time()
         t=time.localtime(tm)
