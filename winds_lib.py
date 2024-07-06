@@ -997,7 +997,7 @@ def gatherAllStationData(_fmiApiKey):
     htmlCode.append('<META HTTP-EQUIV="REFRESH" CONTENT="600">\n')
     htmlCode.append('    <script type="text/javascript" src="wind_data/sylvester.js">\n')
     htmlCode.append('    </script>\n')
-    htmlCode.append('    <script type="text/javascript" src="wind_data/history_graph.js">\n')
+    htmlCode.append('    <script type="text/javascript" src="wind_data/history_graph.js?v=2">\n')
     htmlCode.append('    </script>\n')
     htmlCode.append('    <script>\n')
     htmlCode.append('      window.onload = function(){\n')
