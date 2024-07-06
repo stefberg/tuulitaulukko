@@ -1,6 +1,6 @@
 ﻿AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: An AWS Serverless Specification for WindUpdate
+Description: An AWS Serverless Specification for WindUpdateTest.
 Resources:
   WindUpdate:
     Type: 'AWS::Serverless::Function'
@@ -11,7 +11,7 @@ Resources:
       Description: ''
       MemorySize: 128
       Timeout: 80
-      Role: 'arn:aws:iam::514307432574:role/service-role/WindUpdateRole'
+      Role: 'arn:aws:iam::514307432574:role/service-role/WindUpdateTest-role-zeqcf5g5'
       Events:
         Schedule1:
           Type: Schedule
