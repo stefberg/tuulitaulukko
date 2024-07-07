@@ -1,8 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import xml.dom.minidom
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import time
 import os
 import sys
@@ -12,14 +12,14 @@ infoUrl = 'http://www.emhi.ee/index.php?ide=15&v_kiht=1'
 codes = ["86093", "86094", "26120", "26115", "26218", "26231"]
 
 def getUrl(url):
-    req = urllib2.Request(
+    req = urllib.request.Request(
         url, 
         data=None, 
         headers={
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
         }
     )
-    return urllib2.urlopen(req).read()
+    return urllib.request.urlopen(req).read().decode("iso-8859-1")
 
 def gatherAllStationData():
     page = getUrl(url)
@@ -32,7 +32,7 @@ def gatherAllStationData():
     try:
         dom = xml.dom.minidom.parseString(page)
     except:
-        print >> sys.stderr, page
+        print(page, file=sys.stderr)
         return htmlCode
 
     observations = dom.getElementsByTagName("observations")
@@ -59,7 +59,7 @@ def gatherAllStationData():
         for text in node.childNodes:
             if text.nodeType == text.TEXT_NODE:
                 allText = allText + text.data
-        return allText.encode("utf-8")
+        return allText
 
     if "SERVER_NAME" in os.environ:
         htmlCode.append('Content-Type: text/html\n')

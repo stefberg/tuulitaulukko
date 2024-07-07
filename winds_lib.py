@@ -1,13 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import time
 import datetime
 from datetime import timedelta
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import string
 import traceback
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 import re
 import os
 import sys
@@ -25,7 +25,10 @@ stations = [
     #             ("Remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
     #             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
     #             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
-             ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
+#    ("FmiBeta", "Eestiluoto", "101029", '', 'self.wind_speed>=7 and self.wind_dir>=75 and self.wind_dir<=290'),
+    ("FmiBeta", "Itätoukki", "105392", '', 'self.wind_speed>=7'),
+    ("FmiBeta", "Vuosaari", "151028"),
+    ("Swell", "Kruunuvuorenselkä", "https://swell.fmi.fi/Marinehelsinki/csv/kruunuvuorenselka_weatherdata.csv", "https://swell.fmi.fi/Marinehelsinki/"),
     ("Windguru", "Villinginluoto", "id_station=1137&password=vitsiPorkkana12", '', 'self.wind_speed>=6 and self.wind_dir>=75 and self.wind_dir<=290'),
     ("FmiBeta", "Hel.Majakka", "101003"),
     ("FmiBeta", "Harmaja", "100996", '', 'self.wind_speed>=7 and self.wind_dir>=180 and self.wind_dir<=240'),
@@ -37,7 +40,7 @@ stations = [
     #             ("Bw", "nuottaniemi", "http://eps.poista.net/lastWeather", "http://eps.poista.net/logWeather"),
              ("FmiBeta", "Bågaskär", "100969"),
     ("FmiBeta", "Jussarö", "100965"),
-    #             ("Omasaa", "mulan", "/mulan/", '', 'self.wind_speed>=7 and ( self.wind_dir>=78 or self.wind_dir<=20 )'),
+#    ("Omasaa", "Mulan", "/mulan/", '', 'self.wind_speed>=7 and ( self.wind_dir>=78 or self.wind_dir<=20 )'),
     #             ("Remlog", "silversand", "http://www.remlog.com/tuuli/hanko.html"),
              ("FmiBeta", "Tulliniemi", "100946", '', 'self.wind_speed>=8 and self.wind_dir>=78 and self.wind_dir<=205'),
     ("FmiBeta", "Russarö", "100932"),
@@ -130,7 +133,7 @@ spots = [
  ),
     ('Slaktis', 
      ( # one star condition
-         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=235 and self.wind_dir<=275'),
+         ('Tulliniemi', 'self.wind_speed>=8 and self.wind_dir>=235 and self.wind_dir<=310'),
      )
  ),
     ('Yyteri', 
@@ -172,11 +175,12 @@ windguruApiUrl='https://www.windguru.cz/int/wgsapi.php?q=station_data_current&'
 holfuyApiUrl="http://holfuy.com/en/modules/mjso.php?"
 holfuyInfoUrl="http://holfuy.com/en/data/114"
 #ret={"wind_avg":2.72,"wind_max":4.85,"wind_min":1.16,"wind_direction":168.1,"temperature":15.1,"mslp":0,"rh":0,"datetime":"2014-06-28 20:31:35 EEST","unixtime":1403976695,"error_details":""}
-#print ret
+#print(ret)
 #exit()
 
 def getUrl(url):
-    f = urllib.urlopen(url)
+#    print(url, file=sys.stderr)
+    f = urllib.request.urlopen(url)
     res = f.read()
     f.close()
     return res
@@ -184,8 +188,8 @@ def getUrl(url):
 #guruData = getUrl(windguruUrl + "&q=station_data_current&id_station=47")
 #evalThis = guruData[2:len(guruData)-2].replace("null", "0")
 #ret=eval(evalThis)
-#print ret
-#print "wind max", float(ret["wind_max"])/ms_to_knts
+#print(ret)
+#print("wind max", float(ret["wind_max"])/ms_to_knts)
 #exit()
 
 
@@ -373,8 +377,8 @@ class YyteriParser(HTMLParser):
 def onlyAscii(a):
     b=''
     for i in range(0, len(a)):
-        if string.printable.find(a[i]) >= 0:
-            b = b+a[i]
+        if string.printable.find(str(a[i])) >= 0:
+            b = b+str(a[i])
     return b
 
 class SaapalveluParser(HTMLParser):
@@ -405,10 +409,10 @@ class SaapalveluParser(HTMLParser):
             self.divLevel += 1
             if len(attrs) > 0 and attrs[0][0] == 'class' and attrs[0][1] == 'weather-box weather-box-thermometer':
                 self.intempBox = self.divLevel
-#                print >>sys.stderr, attrs[0][1]
+#                print(attrs[0][1], file=sys.stderr)
             if len(attrs) > 0 and attrs[0][0] == 'class' and attrs[0][1] == 'weather-box weather-box-wind':
                 self.inwindBox = self.divLevel
-#                print >>sys.stderr, attrs[0][1]
+#                print(attrs[0][1], file=sys.stderr)
             
     def handle_endtag(self, tag):
 #            self.intemp = False
@@ -430,21 +434,21 @@ class SaapalveluParser(HTMLParser):
             if reg:
                 self.temp = reg.group(1).replace(",", ".")
                 self.intemp = 0
-#                print >>sys.stderr, "temp: ", self.temp
+#                print("temp: ", self.temp, file=sys.stderr)
 
         if self.intemp and data == "Tll hetkell":
             self.intemp = 2
-#            print >>sys.stderr, data
+#            print(data, file=sys.stderr)
             
         if self.intempBox and data == "Lmptila":
             self.intemp = 1
-#            print >>sys.stderr, data
+#            print(data, file=sys.stderr)
 
         if self.inwind == 2:
             reg = re.search('([0-9]+[,\.]*[0-9]*) m/s', data)
             if reg:
                 self.wind_max = reg.group(1).replace(",", ".")
-#                print >>sys.stderr, "wind_speed: ", self.wind_speed
+#                print("wind_speed: ", self.wind_speed, file=sys.stderr)
                 self.inwind = 1
                 self.found = True
 
@@ -452,14 +456,14 @@ class SaapalveluParser(HTMLParser):
             reg = re.search('([0-9]+[,\.]*[0-9]*) m/s', data)
             if reg:
                 self.wind_speed = reg.group(1).replace(",", ".")
-#                print >>sys.stderr, "wind_max: ", self.wind_max
+#                print("wind_max: ", self.wind_max, file=sys.stderr)
                 self.inwind = 1
 
         if self.inwind == 4:
             reg = re.search('\(([0-9]+)$', data)
             if reg:
                 self.wind_dir = reg.group(1)
-#                print >>sys.stderr, "wind_dir: ", self.wind_dir
+#                print("wind_dir: ", self.wind_dir, file=sys.stderr)
                 self.inwind = 1
 
         if self.inwind == 1 and data == "Tuulen suunta ":
@@ -478,7 +482,7 @@ class SaapalveluParser(HTMLParser):
             reg = re.search(' ([0-9]+:[0-9]+)', data)
             if reg:
                 self.time = reg.group(1)
-#                print >>sys.stderr, "time: ", self.time
+#                print("time: ", self.time, file=sys.stderr)
                 self.intime = 0
 
         if self.intime == 1 and data == "klo":
@@ -518,10 +522,10 @@ class SaapalveluParser(HTMLParser):
 #page = getUrl(yyteriUrl)
 #parser = YyteriParser("")
 #parser.feed(page)
-#print parser.time
-#print parser.wind_dir
-#print parser.wind_speed
-#print parser.wind_max
+#print(parser.time)
+#print(parser.wind_dir)
+#print(parser.wind_speed)
+#print(parser.wind_max)
 #exit()
 
 class OmasaaParser(HTMLParser):
@@ -592,15 +596,43 @@ class bwParser:
         self.text = getUrl(url)
         if len(self.text) < 10:
             return
-        reg = re.search('([0-9]+:[0-9]+)[ \t]*Dir:[ \t]*([0-9]+)[ \t]*.*Low:[ \t]*([0-9\.]+)[ \t]*-[ \t]*([0-9\.]+)[ \t]*Avg:[ \t]*([0-9\.]+)[ \t]*High:[ \t]*([0-9\.]+)[ \t]*-[ \t]*([0-9\.]+)[ \t]*([-0-9\.]+)', self.text)
+        reg = re.search(b'([0-9]+:[0-9]+)[ \t]*Dir:[ \t]*([0-9]+)[ \t]*.*Low:[ \t]*([0-9\.]+)[ \t]*-[ \t]*([0-9\.]+)[ \t]*Avg:[ \t]*([0-9\.]+)[ \t]*High:[ \t]*([0-9\.]+)[ \t]*-[ \t]*([0-9\.]+)[ \t]*([-0-9\.]+)', self.text)
         if reg:
-            self.time  = reg.group(1)
+            self.time  = reg.group(1).decode("utf-8")
             self.wind_dir = reg.group(2)
             self.wind_low = reg.group(4)
             self.wind_speed = reg.group(5)
             self.wind_max = reg.group(7)
             self.temp = reg.group(8)
             self.found = True
+
+class csvParser:
+
+    def __init__(self, info_url):
+        self.time = 0
+        self.wind_dir = 0
+        self.wind_low = 0
+        self.wind_speed = 0
+        self.wind_max = 0
+        self.temp = 0
+        self.found = False
+        self.info_url = info_url
+
+    def parse(self, url):
+        self.text = getUrl(url)
+        if len(self.text) < 10:
+            return
+        lines = self.text.decode("utf-8").splitlines()
+        if len(lines) > 10:
+            res = lines[-1].split(',')
+            if len(res) > 6:
+                self.time  = res[0]
+                self.wind_dir = res[4]
+                self.wind_low = res[2]
+                self.wind_speed = res[2]
+                self.wind_max = res[3]
+                self.temp = res[5]
+                self.found = True
 
 class DataGather(object):
     
@@ -610,6 +642,7 @@ class DataGather(object):
         else:
             self.name = ''
         self.time = "00:00"
+        self.display_time = "00:00"
         self.wind_dir = 0
         self.wind_low = 0
         self.wind_speed = 0
@@ -626,11 +659,26 @@ class DataGather(object):
         return self.keli_ehto  and not self.oldTime() and eval(self.keli_ehto)
 
     def oldTime(self):
-        hm = self.time.split(':')
-        if len(hm) < 2:
+#        print(self.time)
+        hour = -1
+        tryformats = ["%Y-%m-%dT%H:%M:%S", "%H:%M"]
+        date_time = None
+        self.display_time = self.time
+        if isinstance(self.time, str):
+            timestr = self.time
+        else:
+            timestr = self.time.decode("utf-8")
+        for tryformat in tryformats:
+            try:
+                date_time = datetime.datetime.strptime(timestr, tryformat)
+                break
+            except ValueError:
+                continue
+        if not date_time:
             return False
-        hr = int(hm[0])
-        min = int(hm[1])
+        hr = date_time.hour
+        min = date_time.minute
+        self.display_time = f"{hr:02}:{min:02}"
         old = False
         tm = time.time()
         t=time.localtime(tm)
@@ -641,7 +689,7 @@ class DataGather(object):
         else:
             old = 24*60 - hour * 60 + minute + (hr * 60 + min) > oldLimitMin    
 #        if old:
-#            print >>sys.stderr, "old time: ", "hour", hour, "minute", minute, "station hour", hr, "station min", min, "limit", oldLimitMin
+#            print("old time: ", "hour", hour, "minute", minute, "station hour", hr, "station min", min, "limit", oldLimitMin, file=sys.stderr)
         return old
 
 class YyteriGather(DataGather):
@@ -759,6 +807,24 @@ class BwGather(DataGather):
             self.wind_max = float(self.parser.wind_max)
             self.temp = float(self.parser.temp)
 
+class SwellGather(DataGather):
+
+    def __init__(self, initData):
+        self.page_url = initData[2]
+        super(SwellGather, self).__init__(initData, initData[3])
+
+    def doGather(self):
+        self.parser = csvParser(self.info_url)
+        self.parser.parse(self.page_url)
+        if self.parser.found:
+            self.found = True
+            self.time = self.parser.time
+            self.wind_dir = float(self.parser.wind_dir)
+            self.wind_low = float(self.parser.wind_low)
+            self.wind_speed = float(self.parser.wind_speed)
+            self.wind_max = float(self.parser.wind_max)
+            self.temp = float(self.parser.temp)
+
 def myfloat(str):
     try:
         return float(str)
@@ -796,17 +862,22 @@ class WindguruGather(DataGather):
 
     def doGather(self):
         self.observationJson = getUrl(windguruApiUrl + self.station)
-#        print >>sys.stderr, self.observationJson
-        self.observation = eval(self.observationJson.replace("null", "0"))
-        if len(self.observation) > 0:
-            self.found = True
-            self.wind_speed = round(float(self.observation["wind_avg"])/ms_to_knts,1)
-            self.wind_max = round(float(self.observation["wind_max"])/ms_to_knts,1)
-            self.wind_low = round(float(self.observation["wind_min"])/ms_to_knts,1)
-            self.wind_dir = round(float(self.observation["wind_direction"]),1)
-            self.temp = float(self.observation["temperature"])
-            tmp = self.observation["datetime"].split(' ')[1].split(':')
-            self.time = tmp[0] + ":" + tmp[1]
+#        print(self.observationJson, file=sys.stderr)
+        try:
+            self.observation = eval(self.observationJson.replace(b"null", b"0"))
+            if len(self.observation) > 0:
+                self.found = True
+                self.wind_speed = round(float(self.observation["wind_avg"])/ms_to_knts,1)
+                self.wind_max = round(float(self.observation["wind_max"])/ms_to_knts,1)
+                self.wind_low = round(float(self.observation["wind_min"])/ms_to_knts,1)
+                self.wind_dir = round(float(self.observation["wind_direction"]),1)
+                self.temp = float(self.observation["temperature"])
+                tmp = self.observation["datetime"].split(' ')[1].split(':')
+                self.time = tmp[0] + ":" + tmp[1]
+        except:
+            print("Problems with data from WindGuru", self.observationJson, file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+            self.found = False
 
 class HolfuyGather(DataGather):
 
@@ -832,7 +903,7 @@ class HolfuyGather(DataGather):
                     tm = self.observation["updated"].split(' ')[1].split(":")
                     self.time = tm[0]+":"+tm[1]
         except:
-            print >>sys.stderr, "Problems with data from Holfui", self.observationJson
+            print("Problems with data from Holfui", self.observationJson, file=sys.stderr)
             traceback.print_exc(file=sys.stderr)
             self.found = False
 
@@ -845,7 +916,7 @@ nullStation = DataGather('', '')
 #          ( (station1, condition3), (station2, condition3) ), ) ]
 
 def onkoSpotillaKelia(spot, S):
-#    print >>sys.stderr, "spot: ", spot
+#    print("spot: ", spot, file=sys.stderr)
     stars = 0
     spotname = spot[0]
     for conditions in spot[1:]:
@@ -854,12 +925,12 @@ def onkoSpotillaKelia(spot, S):
             if len(station) < 2:
                 continue
             name = station[0]
-#            print >>sys.stderr, "name: ", name
+#            print("name: ", name, file=sys.stderr)
             if name in S and S[name].found and not S[name].oldTime():
                 condition = station[1]
                 condition = condition.replace('self.', 'S["'+name+'"].')
                 ret = eval(condition)
-#                print >>sys.stderr, name, condition, ret
+#                print(name, condition, ret, file=sys.stderr)
                 if ret:
                     add_star = True
                 else:
@@ -874,14 +945,14 @@ def gatherAllStationData(_fmiApiKey):
     fmiApiKey = _fmiApiKey
 
     S = {} # stations to use when checking wind on spots
-    list = []
+    res_list = []
 
     for v in stations:
         try:
             gatherer = eval(v[0] + "Gather(v)")
             gatherer.doGather()
             if gatherer.found:
-                list.append(gatherer)
+                res_list.append(gatherer)
                 S[nameToVar(gatherer.name)] = gatherer
             else:
                 S[nameToVar(gatherer.name)] = nullStation
@@ -926,7 +997,7 @@ def gatherAllStationData(_fmiApiKey):
     htmlCode.append('<META HTTP-EQUIV="REFRESH" CONTENT="600">\n')
     htmlCode.append('    <script type="text/javascript" src="wind_data/sylvester.js">\n')
     htmlCode.append('    </script>\n')
-    htmlCode.append('    <script type="text/javascript" src="wind_data/history_graph.js">\n')
+    htmlCode.append('    <script type="text/javascript" src="wind_data/history_graph.js?v=2">\n')
     htmlCode.append('    </script>\n')
     htmlCode.append('    <script>\n')
     htmlCode.append('      window.onload = function(){\n')
@@ -963,7 +1034,7 @@ def gatherAllStationData(_fmiApiKey):
 
     odd = 1
 
-    for l in list:
+    for l in res_list:
         htmlCode.append('	<tr class="')
         if l.oldTime():
             htmlCode.append("oldtime")
@@ -977,7 +1048,7 @@ def gatherAllStationData(_fmiApiKey):
         htmlCode.append('">\n')
         odd = 1 - odd
         htmlCode.append('	  <td align="left"><a href="' + l.info_url + '">' + l.name + '</a></td>\n')
-        htmlCode.append('	  <td>' + str(l.time) + '</td>\n')
+        htmlCode.append('	  <td>' + str(l.display_time) + '</td>\n')
         htmlCode.append('	  <td><a href="javascript:showStation(\'' + l.name + '\', 2)">' + str(l.wind_dir) + '</a></td>\n')
         htmlCode.append('	  <td><a href="javascript:showStation(\'' + l.name + '\', 0)">' + str(l.wind_speed) + '</a></td>\n')
         htmlCode.append('	  <td><a href="javascript:showStation(\'' + l.name + '\', 0)">' + str(l.wind_max) + '</a></td>\n')
@@ -1017,7 +1088,7 @@ def gatherAllStationData(_fmiApiKey):
     htmlCode.append('	  </th>\n')
     htmlCode.append('	</tr>\n')
 
-    for i, spot in zip(range(len(spots)), spots):
+    for i, spot in zip(list(range(len(spots))), spots):
         if i % 2 == 0:
             htmlCode.append('<tr>\n')
         stars = onkoSpotillaKelia(spot, S)
@@ -1053,6 +1124,6 @@ def gatherAllStationData(_fmiApiKey):
     htmlCode.append('<a href="winds_ee.html">Eesti asemat</a><br/><br/>')
     htmlCode.append('Data <a href="http://ilmatieteenlaitos.fi/avoin-data">Ilmatieteen laitos</a><br/>' + str(datetime.datetime.now()))
     htmlCode.append(' </html>')
-    return (htmlCode, list)
+    return (htmlCode, res_list)
 
 
