@@ -72,7 +72,7 @@ function parseWindDir(str) {
 
 function nona(s) 
 {
-    if (s == 'na') {
+    if (s == 'na' || s == 'nan') {
         return '0';
     }
     return s;
@@ -84,7 +84,7 @@ function parseData(yday, dataStr)
   var l;
   for (l = 0; l < sa.length; l++) {
     var fields = sa[l].split(",");
-    if (fields.length > 5 && fields[5].indexOf(":") > 0) {
+      if (sa[l].indexOf("nan") < 0 && fields.length > 5 && fields[5].indexOf(":") > 0 && fields[8] != "nan") {
       if (fields[5].indexOf("T") > 0) {
         // time format is like "2024-07-06T10:00:00" so we leave just the last part to work like the hh:mm format like for other
         fields[5] = fields[5].split("T")[1];
