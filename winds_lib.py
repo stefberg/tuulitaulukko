@@ -868,6 +868,8 @@ class WindguruGather(DataGather):
             if len(self.observation) > 0:
                 self.found = True
                 self.wind_speed = round(float(self.observation["wind_avg"])/ms_to_knts,1)
+                if math.isnan(self.wind_speed):
+                    print("Strange value for wind_speed", self.observationJson)
                 self.wind_max = round(float(self.observation["wind_max"])/ms_to_knts,1)
                 self.wind_low = round(float(self.observation["wind_min"])/ms_to_knts,1)
                 self.wind_dir = round(float(self.observation["wind_direction"]),1)
@@ -997,7 +999,7 @@ def gatherAllStationData(_fmiApiKey):
     htmlCode.append('<META HTTP-EQUIV="REFRESH" CONTENT="600">\n')
     htmlCode.append('    <script type="text/javascript" src="wind_data/sylvester.js">\n')
     htmlCode.append('    </script>\n')
-    htmlCode.append('    <script type="text/javascript" src="wind_data/history_graph.js?v=2">\n')
+    htmlCode.append('    <script type="text/javascript" src="wind_data/history_graph.js?v=3">\n')
     htmlCode.append('    </script>\n')
     htmlCode.append('    <script>\n')
     htmlCode.append('      window.onload = function(){\n')
