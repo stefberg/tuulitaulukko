@@ -841,7 +841,8 @@ class FmiBetaGather(DataGather):
         self.observations = fetch_data_lib.fetchDataNumDays(fmiApiKey, self.station, 0, 'winddirection,windspeedms,windgust,temperature')
         if len(self.observations) > 0:
             last = len(self.observations[0]) - 1
-            while self.observations[0][last].lower() == "nan" and last-1 > 0:
+            while math.isnan(myfloat(self.observations[0][last])) and last-1 > 0:
+                print("NaN value for self.observations", last)
                 last = last - 2
             if last-1 < 0:
                 return
