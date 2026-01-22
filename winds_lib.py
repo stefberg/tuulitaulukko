@@ -21,7 +21,7 @@ fmiApiKey = ''
 
 stations = [ 
     ("FmiBeta", "Emäsalo", "101023"),
-    ("FmiBeta", "Kalbådagrund", "101022"),
+   # ("FmiBeta", "Kalbådagrund", "101022"),
     #             ("Remlog", "leikosaari", "http://www.remlog.com/cgi/tplog.pl?node=leikosaari"),
     #             ("Remlog", "villinginluoto", "http://www.remlog.com/cgi/tplog.pl?node=villinginluoto"),
     #             ("Remlog", "apinalahti", "http://www.remlog.com/cgi/tplog.pl?node=apinalahti", '', 'self.wind_speed>=5 and self.wind_dir>=75 and self.wind_dir<=290'),
@@ -50,7 +50,7 @@ stations = [
     #             ("Yyteri", "yyteri", "http://www.purjelautaliitto.fi/yyteriweather/", '', 'self.wind_speed>=5 and self.wind_dir>=170 and self.wind_dir<=315'),
              ("FmiBeta", "Tahkoluoto", "101267", '', 'self.wind_speed>=8 and self.wind_dir>=170 and self.wind_dir<=315'),
     ("FmiBeta", "Tankar", "101661"),
-    ("FmiBeta", "Ulkokalla", "101673"),
+   # ("FmiBeta", "Ulkokalla", "101673"),
     ("FmiBeta", "Marjaniemi", "101784"),
     ("FmiBeta", "Vihreäsaari", "101794"),
 ]
